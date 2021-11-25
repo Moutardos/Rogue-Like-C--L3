@@ -57,6 +57,7 @@ int generate_floor(Floor* etage){
 	c.x = FLOORW/2;
 	c.y = FLOORH/2;
 
+
 	len_voisines = cell_voisine(voisines, c);
 	for (i = 0; i < len_voisines; i++){
 		toexpand[i] = voisines[i];
@@ -66,7 +67,7 @@ int generate_floor(Floor* etage){
 	while(len_expand){
 		do{
 			if (len_expand ==0)
-				return 0;
+				break;
 			else
 				pos = rand() % len_expand;
 			c = toexpand[pos];
@@ -85,16 +86,32 @@ int generate_floor(Floor* etage){
 		}
 
 	}
-	return 1;
- 
+	spawn_perso(etage);
+ 	return 0;
 }
 
+void spawn_perso(Floor * etage){
+	Position stair;
+	Position spawn[4];
+	unsigned i = 0;
+	stair.x = FLOORW/2;
+	stair.y = FLOORH/2;
+
+	cell_voisine(spawn, stair);
+
+	while(position_type(etage, spawn[i]) == WALL)
+		i++;
+	
+	etage->joueur.pos = spawn[i];
+
+}
 void remove_pos(Position* toexpand, int index, int* len_expand){
     unsigned i;
     for(i = index; i < *len_expand - 1; i++) 
    		toexpand[i] = toexpand[i + 1];
 	*len_expand -= 1;
 }
+
 int is_valid(Floor* etage, Position cellpos, Position* toexpand, int len_expand){
 	unsigned i;
 
@@ -156,4 +173,6 @@ int is_legal(int x, int y){
 	return x > 0 && x < FLOORW - 1 && y > 0 && y < FLOORH - 1;
 }
 
-
+Celltype position_type(Floor* etage, Position pos){
+	return etage->map[pos.y][pos.x].type;
+}
