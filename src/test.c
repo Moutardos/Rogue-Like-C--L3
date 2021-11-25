@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 int test(){
-	if ( ! test_floor() )
+	if ( ! test_floor() || !test_affichage())
 		return 0;
 	return 1;
 }
@@ -26,5 +26,20 @@ int test_floor(){
 		return 0;
 
 	}
+	return 1;
+}
+
+int test_affichage(){
+	unsigned i;
+	MLV_Image*** cell_image = malloc(sizeof(MLV_Image**) * (RANGE+1));
+	Floor* etage = init_floor();
+
+	for(i = 0; i < RANGE; i++)
+		cell_image[i] = malloc(sizeof(MLV_Image*) * (RANGE+1));
+	generate_floor(etage);
+
+	init_mlv(); 
+	init_vision(etage, cell_image);
+	MLV_wait_seconds( 60 );
 	return 1;
 }
