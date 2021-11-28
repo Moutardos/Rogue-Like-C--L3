@@ -130,7 +130,7 @@ int is_eligible(Floor* etage, Position cellpos){
 	unsigned i, j;
 	unsigned count_dist1 = 0, count_dist2 = 0;
 
-	if( ! is_legal(cellpos.x, cellpos.y) )
+	if( ! is_legal(cellpos.x, cellpos.y)  || position_type(etage, cellpos) == STAIR_UP)
 		return 0;
 
 	/* On verifie le nombre de case salle a distance 1 et 2*/
