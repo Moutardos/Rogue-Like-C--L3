@@ -31,16 +31,18 @@ int test_floor(){
 
 int test_affichage(){
 	unsigned i;
-	MLV_Image*** cell_image = malloc(sizeof(MLV_Image**) * (RANGE*2));
+	MLV_Image*** cell_image = malloc(sizeof(MLV_Image**) * (RANGE *2));
 	Floor* etage = init_floor();
 
-	for(i = 0; i < RANGE; i++)
-		cell_image[i] = malloc(sizeof(MLV_Image*) * (RANGE*2));
+	for(i = 0; i < RANGE*2; i++)
+		cell_image[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
 	generate_floor(etage);
 
 	init_mlv(); 
 	init_vision(etage, cell_image);
 	printf("aa");
-	MLV_wait_seconds( 60 );
+	MLV_wait_seconds( 6 );
+	movement_vision(etage, cell_image, SOUTH);
+		MLV_wait_seconds( 103 );
 	return 1;
 }

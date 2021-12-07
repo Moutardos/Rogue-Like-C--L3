@@ -46,15 +46,15 @@ const char* image_url(Celltype cell_type, int theme){
 	}
 }
 int init_vision(Floor* etage, MLV_Image*** cell_image){
-	/* remplie case +x autour du perso*/
+	/* remplie case +x autour du perso*/ 
 	Position pos_joueur = etage->joueur.pos;
 	Position cellpos;
-	unsigned i;  
-	unsigned j;
+	unsigned i;    
+	unsigned j; 
+ 
+			printf(" rentring?  "); 
 
-			printf(" rentring?  ");
-
-	for (j = 0; j <=RANGE; ++j){
+	for (j = 0; j <=RANGE; ++j){ 
 		for (i = 0; i <= RANGE; ++i){
 
 			cellpos.x = pos_joueur.x - (RANGE/2 + RANGE%2) + i;
@@ -67,18 +67,79 @@ int init_vision(Floor* etage, MLV_Image*** cell_image){
 						printf("draw survived\n");
 
 			if( cellpos.x == pos_joueur.x && cellpos.y == pos_joueur.y){
-				printf("c la le prob");
+				printf("PERSO ");
 				MLV_draw_image(image_perso, CELLSIZE * i, CELLSIZE * j);
-			}
+			} 
 
 
 		}
 	}
-	printf("koi");
 	MLV_actualise_window();
-	return 0;
+	return 0; 
 }
 
+int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
+	unsigned int i, j;
+	unsigned int start;
+	int placement[2] = {0,0}; /* [0] = x [1] = y */
+	int movement;
+	int last_line;
+	Position pos_joueur = etage->joueur.pos;
+	Position cellpos;
+
+	if (NULL == cell_image)
+		return 1;
+
+	switch(direction){
+		case NORTH : placement[1] = 1; movement = 1; start = 0; break;
+		case EAST  : placement[0] = 1; movement = -1; start = RANGE; break;
+		case SOUTH : placement[1] = 1; movement = -1; start = RANGE;     break;
+		case WEST  : placement[0] = 1; movement =  1; start = 0;     break;
+	}
+
+	pos_joueur.x -= placement[0] * movement;
+	pos_joueur.y -= placement[1] * movement;/** REMOOOOOVE **/
+	
+	/** SCROLLING **/
+	for(j = start   ; j <= RANGE - placement[1]  && j >= 0; j += movement)
+		for(i = start ; i <= RANGE - placement[0]  && i >= 0; i += movement){
+			printf("cell_image[%d][%d] -> cell_image[%d][%d]\n", j,i, j + movement * placement[1], i + movement * placement[0]);			cell_image[j][i] = cell_image[j + movement * placement[1]][i + movement * placement[0]];
+			MLV_draw_image(cell_image[j][i], CELLSIZE * i, CELLSIZE * j);
+				MLV_wait_seconds( 1);
+				    MLV_actualise_window();
+
+		}
+    
+    /** LOADING **/
+
+	/* La derniere ligne est une ligne pas presente dans l'ancien cell_image, on va la load */
+	last_line = (RANGE+1) * direction;
+	/* Si le deplacement est vertical */
+	if(placement[1]){
+		for(i = 0; i <= RANGE && i >= 0; i += 1){
+			cellpos.x = pos_joueur.x - (RANGE/2 + RANGE%2) + i;
+			cellpos.y = pos_joueur.y - (RANGE + 1) * direction;
+			load_cell(etage, cellpos, &cell_image[last_line][i]); 
+			MLV_draw_image(cell_image[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
+				MLV_wait_seconds( 1);
+				    MLV_actualise_window();
+
+		}
+	}
+	else { 	/* Si le deplacement est horizontal */
+		for(j = start; j <= RANGE && j >= 0; j += movement){
+			cellpos.x = pos_joueur.x + (RANGE + 1) * direction;
+			cellpos.y = pos_joueur.y - (RANGE/2 + RANGE%2) + j;
+			load_cell(etage, cellpos, &cell_image[j][last_line]); 
+			MLV_draw_image(cell_image[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
+		}
+
+	} 
+
+    MLV_actualise_window();
+
+	return 0;
+}
 
 
 char cell_into_char(Celltype cell_type){

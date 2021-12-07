@@ -11,6 +11,11 @@
 #define CELLSIZE 132/* Taille d'une cell en pixel (normalement 32) */
 #define RANGE 6
 
+typedef enum cardinal {
+	NORTH, EAST,
+	SOUTH, WEST
+}Cardinal;
+
 /* Initialise la fenetre
 */
 
@@ -23,6 +28,8 @@ const char* image_url(Celltype cell_type, int theme);
 
 
 int init_vision(Floor* etage, MLV_Image*** cell_image);
+
+int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction);
 
 /* FONCTION DEBUG, renvoie un char indiquant le type de cell
 */
