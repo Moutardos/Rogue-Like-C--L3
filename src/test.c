@@ -2,7 +2,7 @@
 #include "floor.h"
 #include "affichage.h"
 #include "personnage.h"
-
+#include "action.h"
 #include <stddef.h>
 #include <stdio.h>
 
@@ -31,6 +31,7 @@ int test_floor(){
 
 int test_affichage(){
 	unsigned i;
+	Cardinal direction;
 	MLV_Image*** cell_image = malloc(sizeof(MLV_Image**) * (RANGE *2));
 	Floor* etage = init_floor();
 
@@ -40,9 +41,12 @@ int test_affichage(){
 
 	init_mlv(); 
 	init_vision(etage, cell_image);
-	printf("aa");
-	MLV_wait_seconds( 6 );
-	movement_vision(etage, cell_image, SOUTH);
-		MLV_wait_seconds( 103 );
+	
+	while (1){
+		direction = control();
+		deplacer_joueur(etage, direction);
+		movement_vision(etage, cell_image, direction);
+		printf("char at [%d][%d]\n", etage->joueur.pos.y, etage->joueur.pos.x);
+	}
 	return 1;
 }

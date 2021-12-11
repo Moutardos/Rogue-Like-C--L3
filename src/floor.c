@@ -101,8 +101,9 @@ void spawn_perso(Floor * etage){
 
 	while(position_type(etage, spawn[i]) == WALL)
 		i++;
-	
+
 	etage->joueur.pos = spawn[i];
+	printf("char spawn = %d %d\n", etage->joueur.pos.x, etage->joueur.pos.y);
 
 }
 void remove_pos(Position* toexpand, int index, int* len_expand){

@@ -9,11 +9,12 @@
 #define WINDOWS_W 1280
 #define WINDOWS_H 924
 #define CELLSIZE 132/* Taille d'une cell en pixel (normalement 32) */
-#define RANGE 6
+#define RANGE 7
 
 typedef enum cardinal {
 	NORTH, EAST,
-	SOUTH, WEST
+	SOUTH, WEST,
+	NEUTRAL
 }Cardinal;
 
 /* Initialise la fenetre
