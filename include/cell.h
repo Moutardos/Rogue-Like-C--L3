@@ -14,7 +14,11 @@ typedef struct cell{
 	}*/
 }Cell;
 
-
+typedef enum cardinal {
+	NORTH, EAST,
+	SOUTH, WEST,
+	NEUTRAL
+}Cardinal;
 
 typedef struct position{
 	int x;

@@ -11,11 +11,8 @@
 #define CELLSIZE 132/* Taille d'une cell en pixel (normalement 32) */
 #define RANGE 7
 
-typedef enum cardinal {
-	NORTH, EAST,
-	SOUTH, WEST,
-	NEUTRAL
-}Cardinal;
+#define BORDER_GAME CELLSIZE * RANGE
+
 
 /* Initialise la fenetre
 */
@@ -36,6 +33,12 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction);
 */
 char cell_into_char(Celltype cell_type);
 
+
+/* ca tourneeeee (a enlever)*/
+void rotate_pj(Floor* etage);
+
+/* Affiche l'HUD contenant les stats du perso */
+void hud(Floor* etage);
 /* FONCTION DEBUG, affiche le niveau en ascii
 */
 void affiche_floor_ascii(Floor* etage);

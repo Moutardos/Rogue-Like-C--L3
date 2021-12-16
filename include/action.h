@@ -3,11 +3,21 @@
 
 #include "floor.h"
 #include "affichage.h"
+#include "cell.h"
 
-Cardinal control();
+typedef struct action{
+	Cardinal direction
+	/* union {
+		inserer les autres actions
+	}*/
+}Action;
+
+Action control();
 
 Cardinal key_to_cardinal(MLV_Keyboard_button key);
-void deplacer_joueur(Floor* etage, Cardinal direction);
+
+/* Deplace la position du personnage jouable dans l'etage selon la direction */
+void deplacer_joueur(Floor* etage, Action action);
 
 
 #endif

@@ -13,7 +13,7 @@ int test(){
 }
 
 int test_floor(){
-	Floor* etage = init_floor();
+	Floor* etage = init_floor(creation_perso(HUMAN));
 	if ( NULL == etage ){
 		fprintf(stderr, "DEBUG : test_floor() error while allocuting floor ! exiting..\n");
 		return 0;
@@ -31,9 +31,10 @@ int test_floor(){
 
 int test_affichage(){
 	unsigned i;
-	Cardinal direction;
+	Action action;
 	MLV_Image*** cell_image = malloc(sizeof(MLV_Image**) * (RANGE *2));
-	Floor* etage = init_floor();
+	Personnage pj = creation_perso(HUMAN);
+	Floor* etage = init_floor(pj);
 
 	for(i = 0; i < RANGE*2; i++)
 		cell_image[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
@@ -43,9 +44,9 @@ int test_affichage(){
 	init_vision(etage, cell_image);
 	
 	while (1){
-		direction = control();
-		deplacer_joueur(etage, direction);
-		movement_vision(etage, cell_image, direction);
+		action = control();
+		deplacer_joueur(etage, action);
+		movement_vision(etage, cell_image, action.direction);
 		printf("char at [%d][%d]\n", etage->joueur.pos.y, etage->joueur.pos.x);
 	}
 	return 1;

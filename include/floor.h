@@ -16,7 +16,7 @@ typedef struct floor{
 
 /* Initalise la map en la remplissant de mur
 */
-Floor* init_floor();
+Floor* init_floor(Personnage pj);
 
 /* Genere un etage avec des salles vides respectant les consignes 
 */

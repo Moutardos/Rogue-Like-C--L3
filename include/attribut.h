@@ -13,4 +13,7 @@ typedef struct attribut {
 typedef enum {
 	HUMAN
 } Race;
+
+/* Renvoie les attributs du personnage jouable selon sa race */
+Attribut init_PJ_attribut(Race race);
 #endif

@@ -1,12 +1,13 @@
 #include "action.h"
 
-Cardinal control(){
-	MLV_Event ev;
+Action control(){
+	Action action;
 	MLV_Keyboard_button key;
 	MLV_wait_keyboard(&key, NULL, NULL);
 
-	return key_to_cardinal(key);
+	action.direction = key_to_cardinal(key);
 
+	return action;
 	
 }
 
@@ -20,13 +21,16 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 
 	}
 }
-void deplacer_joueur(Floor* etage, Cardinal direction){
+void deplacer_joueur(Floor* etage, Action action){
+	Cardinal direction = action.direction;
 	switch(direction){
-		case NORTH : etage->joueur.pos.y -= 1; break;
+		case NORTH : etage->joueur.pos.y -= 1;break;
 		case SOUTH : etage->joueur.pos.y += 1; break;
 		case EAST : etage->joueur.pos.x += 1; break;
 		case WEST : etage->joueur.pos.x -= 1; break;
 		case NEUTRAL: break;
 	}
+	if (direction != NEUTRAL)
+		etage->joueur.direction = direction;
 	return;
 }

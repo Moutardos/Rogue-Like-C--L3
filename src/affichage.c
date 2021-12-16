@@ -1,8 +1,8 @@
 #include "affichage.h"
 #include <stdio.h>
 
-MLV_Image* image_perso;
-MLV_Image* background;
+static MLV_Image* image_perso;
+static MLV_Image* background;
 
 void init_mlv(){
         MLV_create_window( "ver 0.123 !", "roguelike", WINDOWS_W, WINDOWS_H );
@@ -73,6 +73,7 @@ int init_vision(Floor* etage, MLV_Image*** cell_image){
 
 		}
 	}
+	hud(etage);
 	MLV_actualise_window();
 	return 0; 
 }
@@ -156,13 +157,37 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 		}
 
 	} 
-
+	hud(etage);
+	rotate_pj(etage);
     MLV_actualise_window();
 
 	return 0;
 }
 
+void rotate_pj(Floor* etage){
+	Cardinal direction = etage->joueur.direction;
+	if (direction == WEST)
+		MLV_rotate_image(image_perso, 90); 		
+	MLV_rotate_image 	(image_perso, -90); 		
+}
 
+void hud(Floor* etage){
+	Personnage pj = etage->joueur;
+	Attribut stat_pj = pj.stat;
+
+	Position start;
+	const int nb_line = 2;
+	const int marge = 3;
+	char stat_txt[999];
+
+	start.x = BORDER_GAME;
+	start.y = BORDER_GAME - 100;
+
+	sprintf(stat_txt,"HP: %d   LV: %d\nMP: %d   XP: %d/100\nATK: %d   DEF: %d\nINT: %d   ACC: %d", stat_pj.Hp, pj.level,
+													stat_pj.Mp, pj.xp, stat_pj.Atk, stat_pj.Def, stat_pj.Int, stat_pj.Acc);
+	MLV_draw_text_box(start.x, start.y, 200, 200,  stat_txt, 0, MLV_COLOR_BLACK, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_TEXT_LEFT, MLV_HORIZONTAL_LEFT, MLV_VERTICAL_TOP );
+
+}
 char cell_into_char(Celltype cell_type){
 	switch(cell_type){
 		case WALL: return '#';
@@ -171,8 +196,9 @@ char cell_into_char(Celltype cell_type){
 		case TREASURE: return '?';
 		case STAIR_UP: return '>';
 		case STAIR_DOWN: return '<';
+		default : return 'X'; /* jamais censee etre affiche */
+
 	}
-	return '1'; /* jamais censee etre affiche */
 }
 
 

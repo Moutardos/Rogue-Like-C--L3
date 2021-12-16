@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "affichage.h"
-Floor* init_floor(){
+Floor* init_floor(Personnage pj){
 	unsigned int i, j;
 	Floor* etage = malloc(sizeof(Floor));
 	
@@ -17,6 +17,7 @@ Floor* init_floor(){
 				etage->map[j][i].type = WALL;
 		}
 
+	etage->joueur = pj;
 	return etage;
 
 }
