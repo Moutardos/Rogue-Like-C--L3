@@ -1,11 +1,12 @@
 #include "affichage.h"
 #include <stdio.h>
+#define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 static MLV_Image* image_perso;
 static MLV_Image* background;
 
 void init_mlv(){
-        MLV_create_window( "ver 0.123 !", "roguelike", WINDOWS_W, WINDOWS_H );
+        MLV_create_window( "ver 0.23 !", "roguelike", WINDOWS_W, WINDOWS_H );
         image_perso = MLV_load_image("include/art/mc.png");
         background = MLV_load_image("include/art/bg.png");
         MLV_resize_image(image_perso, CELLSIZE , CELLSIZE );
@@ -31,7 +32,10 @@ int load_cell( Floor* etage, Position cellpos, MLV_Image** image){
 
 	} 
 	else{  
-		*image = background;
+		/* on load une image "fantome" derriere les limites de la carte, empechant le joueur de rentrer et permettant
+		   au programme de pouvuoir free cette partie de la vision du joueur*/
+		*image = MLV_load_image(image_url(WALL,0));
+        MLV_resize_image(*image , 1,1 );
 
 	}
 	/* else affiche carre noir */
@@ -85,7 +89,8 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 	int movement;
 	int last_line;
 	int decalage_y, decalage_x;
-
+	Position player_pos = etage->joueur.pos;
+	Position next_pos;
 	Position cellpos;
 
 	if (NULL == cell_image)
@@ -117,15 +122,46 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 	printf("Decalage y   %d     \n", decalage_y);
 	for(j = start  ; j < RANGE - (1 - decalage_y)*placement[1]   && j >= 0 + decalage_y*placement[1]; j += movement){
 		for(i = start ; i < RANGE - (1 - decalage_x)*placement[0]  && i >= 0 + decalage_x*placement[0]; i += movement){
+			/* Ignore si la prochaine case est vide (en dehors du plateau) */
+				printf("1\n");
+			/* position de la prochaine case dans la vision du joueur*/
+			next_pos.x = i + movement * placement[0];
+			next_pos.y = j + movement * placement[1];
+
+			/* Position absolue des persos selon la carte de l'etage */
+			cellpos.x = player_pos.x - (RANGE/2) + i ;
+			cellpos.y = player_pos.y - (RANGE/2) + j ;
 			
-			if ((i == start && placement[0]) || (j == start && placement[1]))
+
+
+							printf("cell_image[%d][%d] : etage[%d][%d]background ? %d \n", j, i, cellpos.y, cellpos.x, !is_legal(cellpos.x, cellpos.y));
+
+			if (((i == start && placement[0]) || (j == start && placement[1])) && is_legal(cellpos.x, cellpos.y)){
+				printf("je l'ai free");
 				MLV_free_image(cell_image[j][i]);
+			}
+			
 			printf("[%d %d]",j,i);
-			cell_image[j][i] = cell_image[j + movement * placement[1]][i + movement * placement[0]];
+
+
+			if (!is_legal(cellpos.x, cellpos.y)){
+				printf("bonjour\n");
+
+				MLV_draw_image(background, CELLSIZE * i, CELLSIZE * j);
+				continue;
+			}
+
+			/* Remplace l'image de la case actuel par la prochaine selon le mouvement */
+			cell_image[j][i] = cell_image[next_pos.y][next_pos.x];
 			MLV_draw_image(cell_image[j][i], CELLSIZE * i, CELLSIZE * j);
 
 			if( i == RANGE/2  &&  j == RANGE/2 )
 				MLV_draw_image(image_perso, CELLSIZE * i, CELLSIZE * j);
+			/*				    MLV_actualise_window();
+
+				    MLV_wait_keyboard(NULL,NULL,NULL);*/
+
+
 
 		}
 		printf("\n" );
@@ -137,32 +173,54 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 	if(placement[1]){
 		last_line = j;	/* Si le deplacement est vertical */
 		for(i = 0; i < RANGE; i += 1){
-			cellpos.x = etage->joueur.pos.x - (RANGE/2 + RANGE%2) + i +1;
-			cellpos.y = etage->joueur.pos.y + RANGE/2 * movement;
-						printf("cell_image[%d][%d] -> pos_joueur + range = %d\n", cellpos.y,cellpos.x, etage->joueur.pos.y + RANGE*movement); 
-			load_cell(etage, cellpos, &cell_image[last_line][i]); 
-			MLV_draw_image(cell_image[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
+			cellpos.x = player_pos.x - (RANGE/2) + i;
+			cellpos.y = player_pos.y + (RANGE/2) * movement;
+			if(!is_legal(cellpos.x,cellpos.y)){
+								load_cell(etage,cellpos, &cell_image[last_line][i]);
 
+				MLV_draw_image(background, CELLSIZE * i, CELLSIZE * last_line);
+
+			}
+			else{
+						printf("cell_image[%d][%d] -> etage[%d][%d] \n",last_line,i, cellpos.y,cellpos.x ); 
+				load_cell(etage, cellpos, &cell_image[last_line][i]); 
+			MLV_draw_image(cell_image[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
+				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
+
+		}
 		}
 	}
 	else { 	/* Si le deplacement est horizontal */
 		last_line = i;	/* Si le deplacement est horizontal */
 		for(j = 0; j < RANGE; j += 1){
-			cellpos.x = etage->joueur.pos.x + RANGE/2* movement;
-			cellpos.y = etage->joueur.pos.y - (RANGE/2 + RANGE%2) + j +1;
-						printf("cell_image[%d][%d] -> pos_joueur + range = %d\n", cellpos.y,cellpos.x, etage->joueur.pos.x + RANGE*movement); 
+			cellpos.x = player_pos.x + (RANGE/2 ) * movement;
+			cellpos.y = player_pos.y - (RANGE/2) + j;
+			if(!is_legal(cellpos.x,cellpos.y)){
+												load_cell(etage,cellpos, &cell_image[j][last_line]);
 
-			load_cell(etage, cellpos, &cell_image[j][last_line]); 
-			MLV_draw_image(cell_image[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
+				MLV_draw_image(background, CELLSIZE * last_line, CELLSIZE * j);
+
+			}
+			else{
+						printf("cell_image[%d][%d] -> etage[%d][%d] \n",j, last_line, cellpos.y,cellpos.x ); 
+				load_cell(etage, cellpos, &cell_image[j][last_line]); 
+				MLV_draw_image(cell_image[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
+							    MLV_actualise_window();
+
+				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
+			}
 		}
+	}
 
-	} 
+
+	 
 	hud(etage);
 	rotate_pj(etage);
     MLV_actualise_window();
 
 	return 0;
 }
+
 
 void rotate_pj(Floor* etage){
 	Cardinal direction = etage->joueur.direction;
@@ -183,8 +241,8 @@ void hud(Floor* etage){
 	start.x = BORDER_GAME;
 	start.y = BORDER_GAME - 100;
 
-	sprintf(stat_txt,"HP: %d   LV: %d\nMP: %d   XP: %d/100\nATK: %d   DEF: %d\nINT: %d   ACC: %d", stat_pj.Hp, pj.level,
-													stat_pj.Mp, pj.xp, stat_pj.Atk, stat_pj.Def, stat_pj.Int, stat_pj.Acc);
+	sprintf(stat_txt,"HP: %d   LV: %d\nMP: %d   XP: %d/100\nATK: %d   DEF: %d\nINT: %d   ACC: %d\nX = %d Y = %d", stat_pj.Hp, pj.level,
+													stat_pj.Mp, pj.xp, stat_pj.Atk, stat_pj.Def, stat_pj.Int, stat_pj.Acc, pj.pos.x, pj.pos.y);
 	MLV_draw_text_box(start.x, start.y, 200, 200,  stat_txt, 0, MLV_COLOR_BLACK, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_TEXT_LEFT, MLV_HORIZONTAL_LEFT, MLV_VERTICAL_TOP );
 
 }
