@@ -1,17 +1,19 @@
 #ifndef CELL
 #define CELL
 
+#include "coffre.h"
 typedef enum  {
 	WALL, ROOM, MONSTER, TREASURE,
-	STAIR_UP, STAIR_DOWN
+	TREASUREO, STAIR_UP, STAIR_DOWN
 } Celltype;
 
+typedef union entity {
+		/*Monster monster;*/
+		Coffre coffre;
+}Entity;
 typedef struct cell{
 	Celltype type;
-/*	union {
-		Monster monster;
-		Treasure treasure;
-	}*/
+	Entity entity;
 }Cell;
 
 typedef enum cardinal {
@@ -24,5 +26,6 @@ typedef struct position{
 	int x;
 	int y;
 } Position;
+
 
 #endif

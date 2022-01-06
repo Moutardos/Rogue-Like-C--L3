@@ -9,3 +9,7 @@ Personnage creation_perso(Race race){
     pj.direction = NORTH;
     return pj;
 }
+
+int xp_to_levelup(int level){
+    return 100;
+}

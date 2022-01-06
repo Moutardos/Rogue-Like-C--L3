@@ -13,4 +13,8 @@ typedef struct personnage{
 }Personnage;
 
 Personnage creation_perso(Race race);
+
+
+/* Nombre d'xp a atteindre avant d'atteindre le level indique */
+int xp_to_levelup(int level);
 #endif

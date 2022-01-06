@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "affichage.h"
+
 Floor* init_floor(Personnage pj){
 	unsigned int i, j;
 	Floor* etage = malloc(sizeof(Floor));
@@ -18,6 +19,7 @@ Floor* init_floor(Personnage pj){
 		}
 
 	etage->joueur = pj;
+	etage->number = 0;
 	return etage;
 
 }
@@ -55,6 +57,7 @@ int generate_floor(Floor* etage){
 	unsigned i;
 	srand(time(NULL));
 
+	etage->number +=1;
 	c.x = FLOORW/2;
 	c.y = FLOORH/2;
 
@@ -88,7 +91,59 @@ int generate_floor(Floor* etage){
 
 	}
 	spawn_perso(etage);
+		generate_elem(etage);
+		printf("char spawn at [%d][%d]\n", etage->joueur.pos.y, etage->joueur.pos.x);
+
  	return 0;
+}
+
+int generate_elem(Floor* etage){
+	int len = 0;
+	Position* spawnable_tiles = list_of_tiles(etage,&len, 10, ROOM);
+	spawn_treasure(etage, spawnable_tiles, &len);
+
+}
+int spawn_monster(Floor* etage, Position* pos_libre, int* len){
+
+}
+int spawn_treasure(Floor* etage, Position* pos_libre, int* len){
+	int i;
+	Position pos_rand;
+	int index;
+	for(i = 0; i < 5; i++){
+		index = rand() % *len;
+		pos_rand = pos_libre[index];
+				printf("TREASURE AT %d %d\n", pos_rand.y, pos_rand.x);
+
+		etage->map[pos_rand.y][pos_rand.x].type = TREASURE;
+		etage->map[pos_rand.y][pos_rand.x].entity.coffre = init_coffre(etage->number);
+		remove_pos(pos_libre, index, len);
+
+	}
+}	
+
+Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type){
+	Position* result = malloc(sizeof(Position) * FLOORW * FLOORH + 1);
+	int i = 0;
+	int j = 0;
+	int count = 0;
+	Position player_pos = etage->joueur.pos;
+	Position pos;
+	for(j = 0; j < FLOORH; j++){
+		for (i = 0; i < FLOORW; i++){
+			if ( abs(player_pos.x - range) > range && abs(player_pos.y - range) > range){	
+				pos.x = i;
+				pos.y = j;
+				if (position_type(etage, pos) == type){
+					result[count] = pos;
+					count++;
+				}
+				
+			}
+		}
+	}
+	*len = count;
+	return result;
 }
 
 void spawn_perso(Floor * etage){
@@ -107,11 +162,11 @@ void spawn_perso(Floor * etage){
 	printf("char spawn = %d %d\n", etage->joueur.pos.x, etage->joueur.pos.y);
 
 }
-void remove_pos(Position* toexpand, int index, int* len_expand){
+void remove_pos(Position* lst_pos, int index, int* len){
     unsigned i;
-    for(i = index; i < *len_expand - 1; i++) 
-   		toexpand[i] = toexpand[i + 1];
-	*len_expand -= 1;
+    for(i = index; i < *len - 1; i++) 
+   		lst_pos[i] = lst_pos[i + 1];
+	*len -= 1;
 }
 
 int is_valid(Floor* etage, Position cellpos, Position* toexpand, int len_expand){

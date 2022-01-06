@@ -1,16 +1,22 @@
 #include "affichage.h"
+#include "attribut.h"
 #include <stdio.h>
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 static MLV_Image* image_perso;
 static MLV_Image* background;
+static MLV_Image* portrait;
+static MLV_Image* off_limit;
 
 void init_mlv(){
         MLV_create_window( "ver 0.23 !", "roguelike", WINDOWS_W, WINDOWS_H );
         image_perso = MLV_load_image("include/art/mc.png");
+        off_limit = MLV_load_image("include/art/offlimit.png");
         background = MLV_load_image("include/art/bg.png");
+        MLV_draw_image(background,0,0);
+        portrait = MLV_load_image("include/art/portrait.png");
         MLV_resize_image(image_perso, CELLSIZE , CELLSIZE );
-        MLV_resize_image(background, CELLSIZE , CELLSIZE );
+        MLV_resize_image(off_limit, CELLSIZE , CELLSIZE );
 }
 
 
@@ -50,6 +56,8 @@ const char* image_url(Celltype cell_type, int theme){
 		case ROOM: return "include/art/floor03.png";
 		case STAIR_DOWN: return "include/art/stairdown.png";
 		case STAIR_UP: return "include/art/stairup.png";
+		case TREASURE: return "include/art/treasure.png";
+		case TREASUREO: return "include/art/treasureo.png";
 		default : return "include/art/notfound.png";
 	} 
 }
@@ -134,7 +142,7 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			
 
 
-							printf("cell_image[%d][%d] : etage[%d][%d]background ? %d \n", j, i, cellpos.y, cellpos.x, !is_legal(cellpos.x, cellpos.y));
+							printf("cell_image[%d][%d] : etage[%d][%d]off_limit ? %d \n", j, i, cellpos.y, cellpos.x, !is_legal(cellpos.x, cellpos.y));
 
 			if (((i == start && placement[0]) || (j == start && placement[1])) && is_legal(cellpos.x, cellpos.y)){
 				printf("je l'ai free");
@@ -147,7 +155,7 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			if (!is_legal(cellpos.x, cellpos.y)){
 				printf("bonjour\n");
 
-				MLV_draw_image(background, CELLSIZE * i, CELLSIZE * j);
+				MLV_draw_image(off_limit, CELLSIZE * i, CELLSIZE * j);
 				continue;
 			}
 
@@ -178,7 +186,7 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			if(!is_legal(cellpos.x,cellpos.y)){
 								load_cell(etage,cellpos, &cell_image[last_line][i]);
 
-				MLV_draw_image(background, CELLSIZE * i, CELLSIZE * last_line);
+				MLV_draw_image(off_limit, CELLSIZE * i, CELLSIZE * last_line);
 
 			}
 			else{
@@ -198,7 +206,7 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			if(!is_legal(cellpos.x,cellpos.y)){
 												load_cell(etage,cellpos, &cell_image[j][last_line]);
 
-				MLV_draw_image(background, CELLSIZE * last_line, CELLSIZE * j);
+				MLV_draw_image(off_limit, CELLSIZE * last_line, CELLSIZE * j);
 
 			}
 			else{
@@ -215,35 +223,50 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 
 	 
 	hud(etage);
-	rotate_pj(etage);
     MLV_actualise_window();
 
 	return 0;
 }
 
 
-void rotate_pj(Floor* etage){
-	Cardinal direction = etage->joueur.direction;
-	if (direction == WEST)
-		MLV_rotate_image(image_perso, 90); 		
-	MLV_rotate_image 	(image_perso, -90); 		
-}
+
 
 void hud(Floor* etage){
-	Personnage pj = etage->joueur;
-	Attribut stat_pj = pj.stat;
-
+	char stat_txt[999];
 	Position start;
 	const int nb_line = 2;
 	const int marge = 3;
+	Personnage pj = etage->joueur;
+	Attribut stat_pj =  pj.stat;
+	int portrait_size = (WINDOWS_W - BORDER_GAME) * 1/3 +1;
+	MLV_draw_image( portrait,BORDER_GAME, 0);
+	draw_bars(pj, portrait_size);
+
+}
+
+void draw_bars(Personnage pj, int portrait_size){
+	Attribut stat_pj =  pj.stat;
+
+	float hp_percent = stat_pj.Hp / get_max_hp(stat_pj);
+	float mp_percent = stat_pj.Mp / get_max_mp(stat_pj);
+	float xp_percent = pj.xp / xp_to_levelup(pj.level+1);
+
+	int max_bar = portrait_size*2;
+	int bar_h = portrait_size/3;
+
 	char stat_txt[999];
 
-	start.x = BORDER_GAME;
-	start.y = BORDER_GAME - 100;
+	MLV_draw_filled_rectangle(BORDER_GAME + portrait_size, 0, hp_percent * max_bar, bar_h, MLV_rgba(118,205,68, 255));
+	sprintf(stat_txt, "HP: %d/%d", stat_pj.Hp, get_max_hp(stat_pj));
+	MLV_draw_text(BORDER_GAME + portrait_size, bar_h/2, stat_txt, MLV_COLOR_WHITE);
+	
+	MLV_draw_filled_rectangle(BORDER_GAME + portrait_size, bar_h, mp_percent * max_bar, bar_h, MLV_rgba(118,205,217, 255));
+	sprintf(stat_txt, "MP: %d/%d", stat_pj.Mp, get_max_mp(stat_pj));
+	MLV_draw_text(BORDER_GAME + portrait_size, bar_h + bar_h/2, stat_txt, MLV_COLOR_WHITE);
 
-	sprintf(stat_txt,"HP: %d   LV: %d\nMP: %d   XP: %d/100\nATK: %d   DEF: %d\nINT: %d   ACC: %d\nX = %d Y = %d", stat_pj.Hp, pj.level,
-													stat_pj.Mp, pj.xp, stat_pj.Atk, stat_pj.Def, stat_pj.Int, stat_pj.Acc, pj.pos.x, pj.pos.y);
-	MLV_draw_text_box(start.x, start.y, 200, 200,  stat_txt, 0, MLV_COLOR_BLACK, MLV_COLOR_WHITE, MLV_COLOR_BLACK, MLV_TEXT_LEFT, MLV_HORIZONTAL_LEFT, MLV_VERTICAL_TOP );
+	MLV_draw_filled_rectangle(BORDER_GAME + portrait_size, bar_h * 2, xp_percent * max_bar, bar_h, MLV_rgba(92,51,217, 255));
+	sprintf(stat_txt, "XP: %1.0f%", xp_percent);
+	MLV_draw_text(BORDER_GAME + portrait_size, bar_h * 2 + bar_h/2, stat_txt, MLV_COLOR_WHITE);
 
 }
 char cell_into_char(Celltype cell_type){

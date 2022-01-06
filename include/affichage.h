@@ -39,6 +39,10 @@ void rotate_pj(Floor* etage);
 
 /* Affiche l'HUD contenant les stats du perso */
 void hud(Floor* etage);
+
+/* Affiche les trois differentes barres (mana, hp, xp) a cote
+   du portrait du joueur */
+void draw_bars(Personnage pj, int portrait_size);
 /* FONCTION DEBUG, affiche le niveau en ascii
 */
 void affiche_floor_ascii(Floor* etage);
