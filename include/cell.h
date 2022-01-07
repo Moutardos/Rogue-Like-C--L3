@@ -27,5 +27,7 @@ typedef struct position{
 	int y;
 } Position;
 
+/* Renvoie l'information si la cellule peut etre traverse par le joueur */
+int is_traversable(Celltype type);
 
 #endif

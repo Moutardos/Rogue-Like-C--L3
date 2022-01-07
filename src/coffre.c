@@ -8,3 +8,7 @@ Coffre init_coffre(int etage){
 	new_coffre.opened = 0;
 	return new_coffre;
 }
+
+void open_coffre(Coffre coffre){
+	/*todo*/
+}

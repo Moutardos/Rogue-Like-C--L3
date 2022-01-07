@@ -33,22 +33,20 @@ int test_floor(){
 int test_affichage(){
 	unsigned i;
 	Action action;
-	MLV_Image*** cell_image = malloc(sizeof(MLV_Image**) * (RANGE *2));
 	Personnage pj = creation_perso(HUMAN);
 	Floor* etage = init_floor(pj);
 
-	for(i = 0; i < RANGE*2; i++)
-		cell_image[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
 	generate_floor(etage);
 
-	init_mlv(); 
-	init_vision(etage, cell_image);
+	if (! init_mlv()){
+		fprintf(stderr, "DEBUG : init_mlv couldn't allocate correctly ! exiting..\n");
+		return 0;
+
+	} 
+	init_vision(etage);
 	
 	while (1){
-		action = control();
-		deplacer_joueur(etage, action);
-		movement_vision(etage, cell_image, action.direction);
-		printf("char at [%d][%d]\n", etage->joueur.pos.y, etage->joueur.pos.x);
+		treat_action(etage);
 	}
 	return 1;
 }

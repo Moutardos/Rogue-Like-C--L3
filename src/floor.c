@@ -100,16 +100,21 @@ int generate_floor(Floor* etage){
 int generate_elem(Floor* etage){
 	int len = 0;
 	Position* spawnable_tiles = list_of_tiles(etage,&len, 10, ROOM);
-	spawn_treasure(etage, spawnable_tiles, &len);
+	spawn_map_elements(etage, spawnable_tiles, &len);
 
 }
 int spawn_monster(Floor* etage, Position* pos_libre, int* len){
 
 }
-int spawn_treasure(Floor* etage, Position* pos_libre, int* len){
+int spawn_map_elements(Floor* etage, Position* pos_libre, int* len){
 	int i;
 	Position pos_rand;
 	int index;
+	index = rand() % *len;
+	pos_rand = pos_libre[index];
+	printf("STAIRSDOWN %d %d\n", pos_rand.y, pos_rand.x);
+	etage->map[pos_rand.y][pos_rand.x].type = STAIR_DOWN;
+
 	for(i = 0; i < 5; i++){
 		index = rand() % *len;
 		pos_rand = pos_libre[index];
@@ -118,8 +123,8 @@ int spawn_treasure(Floor* etage, Position* pos_libre, int* len){
 		etage->map[pos_rand.y][pos_rand.x].type = TREASURE;
 		etage->map[pos_rand.y][pos_rand.x].entity.coffre = init_coffre(etage->number);
 		remove_pos(pos_libre, index, len);
-
 	}
+	etage->nb_coffre = 5;
 }	
 
 Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type){
@@ -187,7 +192,8 @@ int is_eligible(Floor* etage, Position cellpos){
 	unsigned i, j;
 	unsigned count_dist1 = 0, count_dist2 = 0;
 
-	if( ! is_legal(cellpos.x, cellpos.y)  || position_type(etage, cellpos) == STAIR_UP)
+	if( ! is_legal(cellpos.x, cellpos.y)  || position_type(etage, cellpos) == STAIR_UP
+	 	|| (cellpos.x == 0 || cellpos.x == FLOORW) || (cellpos.y == 0 || cellpos.y == FLOORH))
 		return 0;
 
 	/* On verifie le nombre de case salle a distance 1 et 2*/
@@ -227,9 +233,15 @@ int is_eligible(Floor* etage, Position cellpos){
 }
 
 int is_legal(int x, int y){
-	return x > 0 && x < FLOORW - 1 && y > 0 && y < FLOORH - 1;
+	return x >= 0 && x < FLOORW + 1  && y >= 0 && y < FLOORH + 1;
+}
+
+
+
+Cell cell_at_pos(Floor* etage, Position pos){
+	return etage->map[pos.y][pos.x];
 }
 
 Celltype position_type(Floor* etage, Position pos){
-	return etage->map[pos.y][pos.x].type;
+	return cell_at_pos(etage, pos).type;
 }

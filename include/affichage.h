@@ -17,7 +17,7 @@
 /* Initialise la fenetre
 */
 
-void init_mlv();
+int init_mlv();
 
 int load_cell(Floor* etage, Position cellpos, MLV_Image** image);
 
@@ -25,9 +25,9 @@ int load_cell(Floor* etage, Position cellpos, MLV_Image** image);
 const char* image_url(Celltype cell_type, int theme);
 
 
-int init_vision(Floor* etage, MLV_Image*** cell_image);
+int init_vision(Floor* etage);
 
-int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction);
+int movement_vision(Floor* etage, Cardinal direction);
 
 /* FONCTION DEBUG, renvoie un char indiquant le type de cell
 */
@@ -37,9 +37,13 @@ char cell_into_char(Celltype cell_type);
 /* ca tourneeeee (a enlever)*/
 void rotate_pj(Floor* etage);
 
+/* Recoie une position dans l'etage et renvoie la position selon la vision du joueur */
+Position absolute_pos_to_vision_pos(Floor* etage, Position pos);
 /* Affiche l'HUD contenant les stats du perso */
 void hud(Floor* etage);
 
+/* Load et draw la cell de la case pos_abs dans l'etage en i j */
+void display_cell(Floor* etage, Position pos_abs, int i, int j);
 /* Affiche les trois differentes barres (mana, hp, xp) a cote
    du portrait du joueur */
 void draw_bars(Personnage pj, int portrait_size);

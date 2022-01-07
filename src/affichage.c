@@ -7,16 +7,35 @@ static MLV_Image* image_perso;
 static MLV_Image* background;
 static MLV_Image* portrait;
 static MLV_Image* off_limit;
+static MLV_Image*** vision_joueur;
 
-void init_mlv(){
+int init_mlv(){
+		unsigned int i = 0;
+        
         MLV_create_window( "ver 0.23 !", "roguelike", WINDOWS_W, WINDOWS_H );
-        image_perso = MLV_load_image("include/art/mc.png");
-        off_limit = MLV_load_image("include/art/offlimit.png");
-        background = MLV_load_image("include/art/bg.png");
-        MLV_draw_image(background,0,0);
-        portrait = MLV_load_image("include/art/portrait.png");
+        image_perso = MLV_load_image("art/sprite/char/mc.png");
         MLV_resize_image(image_perso, CELLSIZE , CELLSIZE );
+        
+        off_limit = MLV_load_image("art/map/offlimit.png");
+        
+        background = MLV_load_image("art/hud/bg.png");
+        MLV_draw_image(background,0,0);
+        
+        portrait = MLV_load_image("art/hud/portrait.png");
         MLV_resize_image(off_limit, CELLSIZE , CELLSIZE );
+        
+        vision_joueur =  malloc(sizeof(MLV_Image**) * (RANGE *2));
+        if( vision_joueur == NULL)
+        	return 0;
+
+        for(i = 0; i < RANGE*2; i++){
+			vision_joueur[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
+			if (vision_joueur[i] == NULL){
+				return 0;
+			}
+        }
+
+;
 }
 
 
@@ -52,16 +71,16 @@ int load_cell( Floor* etage, Position cellpos, MLV_Image** image){
 const char* image_url(Celltype cell_type, int theme){
 	/* theme represente le biome de l'etage TODO*/
 	switch(cell_type){
-		case WALL: return "include/art/wall01.png";
-		case ROOM: return "include/art/floor03.png";
-		case STAIR_DOWN: return "include/art/stairdown.png";
-		case STAIR_UP: return "include/art/stairup.png";
-		case TREASURE: return "include/art/treasure.png";
-		case TREASUREO: return "include/art/treasureo.png";
-		default : return "include/art/notfound.png";
+		case WALL: return "art/map/wall01.png";
+		case ROOM: return "art/map/floor03.png";
+		case STAIR_DOWN: return "art/map/stairdown.png";
+		case STAIR_UP: return "art/map/stairup.png";
+		case TREASURE: return "art/map/treasure.png";
+		case TREASUREO: return "art/map/treasureo.png";
+		default : return "art/map/notfound.png";
 	} 
 }
-int init_vision(Floor* etage, MLV_Image*** cell_image){
+int init_vision(Floor* etage){
 	/* remplie case +x autour du perso*/ 
 	Position pos_joueur = etage->joueur.pos;
 	Position cellpos;
@@ -72,11 +91,11 @@ int init_vision(Floor* etage, MLV_Image*** cell_image){
 	for (j = 0; j <RANGE; ++j){ 
 		for (i = 0; i <RANGE; ++i){
 
-			cellpos.x = pos_joueur.x - (RANGE/2 + RANGE%2) + i + 1; /* hard value +1, je sais pas pourquoi ... */
-			cellpos.y = pos_joueur.y - (RANGE/2 + RANGE%2) + j + 1;
+			cellpos.x = pos_joueur.x - (RANGE/2 + RANGE%2) + i +1; 
+			cellpos.y = pos_joueur.y - (RANGE/2 + RANGE%2) + j +1;
 
-			load_cell(etage, cellpos, &cell_image[j][i]); 
-			MLV_draw_image(cell_image[j][i], CELLSIZE * i, CELLSIZE * j);
+			load_cell(etage, cellpos, &vision_joueur[j][i]); 
+			MLV_draw_image(vision_joueur[j][i], CELLSIZE * i, CELLSIZE * j);
 
 			if( cellpos.x == pos_joueur.x && cellpos.y == pos_joueur.y){
 				MLV_draw_image(image_perso, CELLSIZE * i, CELLSIZE * j);
@@ -90,7 +109,7 @@ int init_vision(Floor* etage, MLV_Image*** cell_image){
 	return 0; 
 }
 
-int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
+int movement_vision(Floor* etage, Cardinal direction){
 	unsigned int i, j;
 	unsigned int start;
 	int placement[2] = {0,0}; /* [0] = x [1] = y */
@@ -101,7 +120,7 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 	Position next_pos;
 	Position cellpos;
 
-	if (NULL == cell_image)
+	if (NULL == vision_joueur)
 		return 1;
 
 	switch(direction){
@@ -142,11 +161,11 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			
 
 
-							printf("cell_image[%d][%d] : etage[%d][%d]off_limit ? %d \n", j, i, cellpos.y, cellpos.x, !is_legal(cellpos.x, cellpos.y));
+							printf("vision_joueur[%d][%d] : etage[%d][%d]off_limit ? %d \n", j, i, cellpos.y, cellpos.x, !is_legal(cellpos.x, cellpos.y));
 
 			if (((i == start && placement[0]) || (j == start && placement[1])) && is_legal(cellpos.x, cellpos.y)){
 				printf("je l'ai free");
-				MLV_free_image(cell_image[j][i]);
+				MLV_free_image(vision_joueur[j][i]);
 			}
 			
 			printf("[%d %d]",j,i);
@@ -160,8 +179,8 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			}
 
 			/* Remplace l'image de la case actuel par la prochaine selon le mouvement */
-			cell_image[j][i] = cell_image[next_pos.y][next_pos.x];
-			MLV_draw_image(cell_image[j][i], CELLSIZE * i, CELLSIZE * j);
+			vision_joueur[j][i] = vision_joueur[next_pos.y][next_pos.x];
+			MLV_draw_image(vision_joueur[j][i], CELLSIZE * i, CELLSIZE * j);
 
 			if( i == RANGE/2  &&  j == RANGE/2 )
 				MLV_draw_image(image_perso, CELLSIZE * i, CELLSIZE * j);
@@ -177,22 +196,22 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
     
     /** LOADING **/
 		printf("LOADING\n");
-	/* La derniere ligne est une ligne pas presente dans l'ancien cell_image, on va la load */
+	/* La derniere ligne est une ligne pas presente dans l'ancien vision_joueur, on va la load */
 	if(placement[1]){
 		last_line = j;	/* Si le deplacement est vertical */
 		for(i = 0; i < RANGE; i += 1){
 			cellpos.x = player_pos.x - (RANGE/2) + i;
 			cellpos.y = player_pos.y + (RANGE/2) * movement;
 			if(!is_legal(cellpos.x,cellpos.y)){
-								load_cell(etage,cellpos, &cell_image[last_line][i]);
+								load_cell(etage,cellpos, &vision_joueur[last_line][i]);
 
 				MLV_draw_image(off_limit, CELLSIZE * i, CELLSIZE * last_line);
 
 			}
 			else{
-						printf("cell_image[%d][%d] -> etage[%d][%d] \n",last_line,i, cellpos.y,cellpos.x ); 
-				load_cell(etage, cellpos, &cell_image[last_line][i]); 
-			MLV_draw_image(cell_image[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
+						printf("vision_joueur[%d][%d] -> etage[%d][%d] \n",last_line,i, cellpos.y,cellpos.x ); 
+				load_cell(etage, cellpos, &vision_joueur[last_line][i]); 
+			MLV_draw_image(vision_joueur[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
 				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
 
 		}
@@ -204,15 +223,15 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 			cellpos.x = player_pos.x + (RANGE/2 ) * movement;
 			cellpos.y = player_pos.y - (RANGE/2) + j;
 			if(!is_legal(cellpos.x,cellpos.y)){
-												load_cell(etage,cellpos, &cell_image[j][last_line]);
+												load_cell(etage,cellpos, &vision_joueur[j][last_line]);
 
 				MLV_draw_image(off_limit, CELLSIZE * last_line, CELLSIZE * j);
 
 			}
 			else{
-						printf("cell_image[%d][%d] -> etage[%d][%d] \n",j, last_line, cellpos.y,cellpos.x ); 
-				load_cell(etage, cellpos, &cell_image[j][last_line]); 
-				MLV_draw_image(cell_image[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
+						printf("vision_joueur[%d][%d] -> etage[%d][%d] \n",j, last_line, cellpos.y,cellpos.x ); 
+				load_cell(etage, cellpos, &vision_joueur[j][last_line]); 
+				MLV_draw_image(vision_joueur[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
 							    MLV_actualise_window();
 
 				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
@@ -230,7 +249,23 @@ int movement_vision(Floor* etage, MLV_Image*** cell_image, Cardinal direction){
 
 
 
+Position absolute_pos_to_vision_pos(Floor* etage, Position pos){
+	Position vision_pos;
+	Position player_pos = etage->joueur.pos;
+	vision_pos.x = pos.x - player_pos.x + RANGE/2;
+	vision_pos.y = pos.y - player_pos.y + RANGE/2;
+	return vision_pos;
 
+}
+void update_cell(Floor* etage, Position pos){
+	Position vision_pos = absolute_pos_to_vision_pos(etage, pos);
+	int y = vision_pos.y;
+	int x = vision_pos.x;
+	load_cell(etage, pos, &vision_joueur[y][x]);
+	MLV_draw_image(vision_joueur[y][x], CELLSIZE * x, CELLSIZE * y);
+	MLV_actualise_window();
+
+}
 void hud(Floor* etage){
 	char stat_txt[999];
 	Position start;

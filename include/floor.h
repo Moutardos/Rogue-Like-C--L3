@@ -9,8 +9,7 @@
 
 typedef struct floor{
 	Cell map[FLOORH][FLOORW];
-	/* treasor count
-	*/
+	int nb_coffre;
 	Personnage joueur;
 	int number;
 }Floor;
@@ -29,7 +28,9 @@ int generate_elem(Floor* etage);
 void spawn_perso(Floor * etage);
 
 int spawn_monster(Floor* etage, Position* pos_libre, int* len);
-int spawn_treasure(Floor* etage, Position* pos_libre, int* len);
+
+/* Tresors et escalier du bas */
+int spawn_map_elements(Floor* etage, Position* pos_libre, int* len);
 
 /* Fonction generation de floor : renvoie 1 si la case mur en position celpos est admissible
 */
@@ -56,4 +57,7 @@ Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type);
 /* Retourne le type de cell dans la position pos de l'etage
 */
 Celltype position_type(Floor* etage, Position pos);
+
+Cell cell_at_pos(Floor* etage, Position pos);
+
 #endif
