@@ -44,8 +44,9 @@ int test_affichage(){
 
 	} 
 	init_vision(etage);
-	
+	 
 	while (1){
+		affiche_floor_ascii(etage);
 		treat_action(etage);
 	}
 	return 1;

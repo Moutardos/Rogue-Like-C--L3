@@ -15,12 +15,11 @@ typedef enum {
 	SEMI_ORC
 } Race;
 
+
 /* Renvoie les attributs du personnage jouable selon sa race */
 Attribut init_PJ_attribut(Race race);
 
 
-/* Renvoie les stat de level up selon la race */
-Attribut stat_gain(Race race);
 
 /* Renvoie la limite max d'hp selon les stats */
 int get_max_hp(Attribut stat);

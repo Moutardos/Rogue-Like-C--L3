@@ -23,6 +23,7 @@ int load_cell(Floor* etage, Position cellpos, MLV_Image** image);
 
 
 const char* image_url(Celltype cell_type, int theme);
+const char* image_url_monstre(TypeMonstre monstre);
 
 
 int init_vision(Floor* etage);
@@ -46,7 +47,10 @@ void hud(Floor* etage);
 void display_cell(Floor* etage, Position pos_abs, int i, int j);
 /* Affiche les trois differentes barres (mana, hp, xp) a cote
    du portrait du joueur */
-void draw_bars(Personnage pj, int portrait_size);
+void draw_char_bars(Personnage pj, int portrait_size);
+
+/* Affiche une barre a la position indique, affichant le pourcentage de completion */
+void draw_bar(int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag);
 /* FONCTION DEBUG, affiche le niveau en ascii
 */
 void affiche_floor_ascii(Floor* etage);

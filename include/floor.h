@@ -11,7 +11,10 @@ typedef struct floor{
 	Cell map[FLOORH][FLOORW];
 	int nb_coffre;
 	Personnage joueur;
+	int nb_monstre;
+	Position* monstres_pos;
 	int number;
+
 }Floor;
 
 /* Initalise la map en la remplissant de mur
@@ -21,16 +24,16 @@ Floor* init_floor(Personnage pj);
 /* Genere un etage avec des salles vides respectant les consignes 
 */
 int generate_floor(Floor* etage);
-/* Genere les elements de l'etage (Tresors et monstres)*/
-int generate_elem(Floor* etage);
+
+/* Genere les elements de l'etage supplementaire (Tresors et monstres), renvoie la liste de monstre*/
+Position* generate_elem(Floor* etage);
+
 /* Fait apparaitre le personnage principal dans une case a cote de l'escalier
 */
 void spawn_perso(Floor * etage);
 
-int spawn_monster(Floor* etage, Position* pos_libre, int* len);
-
-/* Tresors et escalier du bas */
-int spawn_map_elements(Floor* etage, Position* pos_libre, int* len);
+/* Fait apparaitre un element du type indique dans la position */
+void spawn_elem(Floor* etage, Celltype type, Position pos);
 
 /* Fonction generation de floor : renvoie 1 si la case mur en position celpos est admissible
 */
@@ -49,10 +52,23 @@ int is_valid(Floor* etage, Position cellpos, Position* toexpand, int len_expand)
 void remove_pos(Position* lst_pos, int index, int* len);
 
 /* Renvoie un tableau de position d'un certain type dans l'etage actuel, les positions
-   sont a une distance  range du personnage.
+   sont a une distance  range de l'escalier montant. (couteux)
    Renvoie la longueur du tableau dans len.
 */
 Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type);
+
+/* Fait apparaitre les tresors proteges par les monstres, verifiant dans chaque room si il n'y a 
+   qu'une seule voisine room dans lequel va etre le gardien
+   /!\ detruit la liste en parametre
+*/
+void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre  );
+
+/* Prend une element au hasard d'un tableau de position, le fait apparaitre et le supprime
+   de la liste */
+Position spawn_elem_in_list(Floor* etage, Celltype type, int* len, Position* pos_libre);
+
+
+
 
 /* Retourne le type de cell dans la position pos de l'etage
 */

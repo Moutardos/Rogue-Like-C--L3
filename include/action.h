@@ -14,7 +14,7 @@ typedef enum typeaction{
 typedef struct action{
 	Cardinal direction;
 	Typeaction typeaction;
-}Action;
+}Action; 
 
 Action control();
 

@@ -42,13 +42,20 @@ int init_mlv(){
 
 int load_cell( Floor* etage, Position cellpos, MLV_Image** image){
 	Celltype type; 
+	TypeMonstre type_monstre;
+
 	if (is_legal(cellpos.x, cellpos.y)){
 
 
 		type = position_type(etage, cellpos);
 		if( type != ROOM && type != WALL){ /* type transparent */
 			*image = MLV_load_image(image_url(ROOM,0)); 
-			MLV_draw_image_on_image(MLV_load_image(image_url(type,0)), *image, 0,0);
+			if (type == MONSTER){
+				type_monstre = cell_at_pos(etage, cellpos).entity.monstre.type;
+				MLV_draw_image_on_image(MLV_load_image(image_url_monstre(type_monstre)), *image, 0,0);
+			}
+			else
+				MLV_draw_image_on_image(MLV_load_image(image_url(type,0)), *image, 0,0);
 		}
 		else
 			*image = MLV_load_image(image_url(type, 0));
@@ -79,6 +86,13 @@ const char* image_url(Celltype cell_type, int theme){
 		case TREASUREO: return "art/map/treasureo.png";
 		default : return "art/map/notfound.png";
 	} 
+}
+
+const char* image_url_monstre(TypeMonstre monstre){
+	switch(monstre){
+		case ALIEN: return "art/sprite/enemy/Etest.png";
+
+	}
 }
 int init_vision(Floor* etage){
 	/* remplie case +x autour du perso*/ 
@@ -209,7 +223,7 @@ int movement_vision(Floor* etage, Cardinal direction){
 
 			}
 			else{
-						printf("vision_joueur[%d][%d] -> etage[%d][%d] \n",last_line,i, cellpos.y,cellpos.x ); 
+						printf("vision_joueur[%d][%d] -> etage[%d][%d] -> type =%d\n",last_line,i, cellpos.y,cellpos.x, position_type(etage, cellpos) ); 
 				load_cell(etage, cellpos, &vision_joueur[last_line][i]); 
 			MLV_draw_image(vision_joueur[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
 				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
@@ -223,7 +237,7 @@ int movement_vision(Floor* etage, Cardinal direction){
 			cellpos.x = player_pos.x + (RANGE/2 ) * movement;
 			cellpos.y = player_pos.y - (RANGE/2) + j;
 			if(!is_legal(cellpos.x,cellpos.y)){
-												load_cell(etage,cellpos, &vision_joueur[j][last_line]);
+				load_cell(etage,cellpos, &vision_joueur[j][last_line]);
 
 				MLV_draw_image(off_limit, CELLSIZE * last_line, CELLSIZE * j);
 
@@ -232,7 +246,6 @@ int movement_vision(Floor* etage, Cardinal direction){
 						printf("vision_joueur[%d][%d] -> etage[%d][%d] \n",j, last_line, cellpos.y,cellpos.x ); 
 				load_cell(etage, cellpos, &vision_joueur[j][last_line]); 
 				MLV_draw_image(vision_joueur[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
-							    MLV_actualise_window();
 
 				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
 			}
@@ -275,33 +288,31 @@ void hud(Floor* etage){
 	Attribut stat_pj =  pj.stat;
 	int portrait_size = (WINDOWS_W - BORDER_GAME) * 1/3 +1;
 	MLV_draw_image( portrait,BORDER_GAME, 0);
-	draw_bars(pj, portrait_size);
+	draw_char_bars(pj, portrait_size);
 
 }
 
-void draw_bars(Personnage pj, int portrait_size){
+void draw_char_bars(Personnage pj, int portrait_size){
 	Attribut stat_pj =  pj.stat;
-
-	float hp_percent = stat_pj.Hp / get_max_hp(stat_pj);
-	float mp_percent = stat_pj.Mp / get_max_mp(stat_pj);
 	float xp_percent = pj.xp / xp_to_levelup(pj.level+1);
-
+	int start_x = BORDER_GAME + portrait_size;
 	int max_bar = portrait_size*2;
 	int bar_h = portrait_size/3;
 
+	draw_bar(stat_pj.Hp, get_max_hp(stat_pj), start_x, 0, bar_h, max_bar, MLV_rgba(118,205,68, 255), "HP");
+	draw_bar(stat_pj.Mp, get_max_mp(stat_pj), start_x, bar_h, bar_h, max_bar, MLV_rgba(118,205,217, 255), "MP");
+	draw_bar(pj.xp, xp_to_levelup(pj.level + 1), start_x, bar_h*2, bar_h, max_bar,  MLV_rgba(92,51,217, 255), "XP");
+
+
+}
+
+void draw_bar(int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag){
+	float percent = value/max_value;
 	char stat_txt[999];
 
-	MLV_draw_filled_rectangle(BORDER_GAME + portrait_size, 0, hp_percent * max_bar, bar_h, MLV_rgba(118,205,68, 255));
-	sprintf(stat_txt, "HP: %d/%d", stat_pj.Hp, get_max_hp(stat_pj));
-	MLV_draw_text(BORDER_GAME + portrait_size, bar_h/2, stat_txt, MLV_COLOR_WHITE);
-	
-	MLV_draw_filled_rectangle(BORDER_GAME + portrait_size, bar_h, mp_percent * max_bar, bar_h, MLV_rgba(118,205,217, 255));
-	sprintf(stat_txt, "MP: %d/%d", stat_pj.Mp, get_max_mp(stat_pj));
-	MLV_draw_text(BORDER_GAME + portrait_size, bar_h + bar_h/2, stat_txt, MLV_COLOR_WHITE);
-
-	MLV_draw_filled_rectangle(BORDER_GAME + portrait_size, bar_h * 2, xp_percent * max_bar, bar_h, MLV_rgba(92,51,217, 255));
-	sprintf(stat_txt, "XP: %1.0f%", xp_percent);
-	MLV_draw_text(BORDER_GAME + portrait_size, bar_h * 2 + bar_h/2, stat_txt, MLV_COLOR_WHITE);
+	MLV_draw_filled_rectangle(x, y, percent * width, height, color);
+	sprintf(stat_txt, "%s: %d/%d", tag, value, max_value);
+	MLV_draw_text(x, y + height/2, stat_txt, MLV_COLOR_WHITE);
 
 }
 char cell_into_char(Celltype cell_type){
@@ -312,7 +323,8 @@ char cell_into_char(Celltype cell_type){
 		case TREASURE: return '?';
 		case STAIR_UP: return '>';
 		case STAIR_DOWN: return '<';
-		default : return 'X'; /* jamais censee etre affiche */
+		case TREASUREO: 't';
+		default : return 'Z'; /* jamais censee etre affiche */
 
 	}
 }
@@ -326,9 +338,12 @@ void affiche_floor_ascii(Floor* etage){
 			Position pos;
 			pos.y = j;
 			pos.x = i;
-			printf("%c",cell_into_char(position_type(etage, pos)));
+			if (etage->joueur.pos.x == pos.x && etage->joueur.pos.y == pos.y)
+				printf("X");
+			else
+				printf("%c",cell_into_char(position_type(etage, pos)));
 		}
-		printf("\n");
+		printf(" %d\n",j);
 	}
 
 }

@@ -20,6 +20,10 @@ Floor* init_floor(Personnage pj){
 
 	etage->joueur = pj;
 	etage->number = 0;
+	etage->nb_monstre = 0;
+	etage->nb_coffre = 0;
+
+	etage->monstres_pos = malloc(sizeof(Position) * MONSTER_MAX);
 	return etage;
 
 }
@@ -58,6 +62,7 @@ int generate_floor(Floor* etage){
 	srand(time(NULL));
 
 	etage->number +=1;
+
 	c.x = FLOORW/2;
 	c.y = FLOORH/2;
 
@@ -97,36 +102,45 @@ int generate_floor(Floor* etage){
  	return 0;
 }
 
-int generate_elem(Floor* etage){
+Position* generate_elem(Floor* etage){
 	int len = 0;
-	Position* spawnable_tiles = list_of_tiles(etage,&len, 10, ROOM);
-	spawn_map_elements(etage, spawnable_tiles, &len);
+	int i = 0;
+	Position* empty_tiles = list_of_tiles(etage,&len, 10, ROOM);
+	printf("len   %d\n", len);
+	spawn_protected_treasure(etage, len, empty_tiles);
+
+
+
 
 }
-int spawn_monster(Floor* etage, Position* pos_libre, int* len){
-
-}
-int spawn_map_elements(Floor* etage, Position* pos_libre, int* len){
-	int i;
-	Position pos_rand;
+Position spawn_elem_in_list(Floor* etage, Celltype type, int* len, Position* pos_libre){
+	Position pos;
 	int index;
+
 	index = rand() % *len;
-	pos_rand = pos_libre[index];
-	printf("STAIRSDOWN %d %d\n", pos_rand.y, pos_rand.x);
-	etage->map[pos_rand.y][pos_rand.x].type = STAIR_DOWN;
+	pos = pos_libre[index];
+	spawn_elem(etage, type, pos);
+	remove_pos(pos_libre, index, len);
+	return pos;
+}
 
-	for(i = 0; i < 5; i++){
-		index = rand() % *len;
-		pos_rand = pos_libre[index];
-				printf("TREASURE AT %d %d\n", pos_rand.y, pos_rand.x);
-
-		etage->map[pos_rand.y][pos_rand.x].type = TREASURE;
-		etage->map[pos_rand.y][pos_rand.x].entity.coffre = init_coffre(etage->number);
-		remove_pos(pos_libre, index, len);
+void spawn_elem(Floor* etage, Celltype type, Position pos){
+	etage->map[pos.y][pos.x].type = type;
+	switch(type){
+		case TREASURE :
+			etage->map[pos.y][pos.x].entity.coffre = init_coffre(etage->number);
+			etage->nb_coffre += 1;
+			break;
+		case MONSTER :
+			etage->map[pos.y][pos.x].entity.monstre = init_monstre(ALIEN, etage->number);
+			etage->monstres_pos[etage->nb_monstre] = pos;
+			etage->nb_monstre++;
+			break;
+		default:
+		break;
 	}
-	etage->nb_coffre = 5;
-}	
 
+}
 Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type){
 	Position* result = malloc(sizeof(Position) * FLOORW * FLOORH + 1);
 	int i = 0;
@@ -147,9 +161,55 @@ Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type){
 			}
 		}
 	}
+
 	*len = count;
+
 	return result;
 }
+
+void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre  ){
+	int i = 0;
+	int j = 0;
+	int countV;
+	int index;
+	Position voisines[4];
+	Position pos;
+	Position* spawnable_treasure = malloc(sizeof(Position) * len);
+	int len_treasure = 0;
+
+	/* Create a list of spawnable protected treasure location */
+	for(i = 0; i < len; i++){
+		pos = pos_libre[i];
+		countV = 0;
+		cell_voisine(voisines, pos);
+				printf("checking %d %d ", pos.y, pos.x);
+
+		for (j = 0; j < 4; j++){
+			if (position_type(etage, voisines[j]) == ROOM)
+				countV++;
+		}
+		printf("i got %d voisines room", countV);
+		if (countV == 1){
+					printf("im good  ");
+			spawnable_treasure[len_treasure] = pos;
+			len_treasure++;
+		}
+		printf("\n");
+	}
+	/* Spawn them at 5 random position */
+
+	for(i = 0; i < 5; i++){
+		index = rand() % len_treasure;
+		pos = spawnable_treasure[index];
+
+		spawn_elem(etage, TREASURE, pos);
+		remove_pos(spawnable_treasure, index, &len_treasure);
+	}
+	free(spawnable_treasure);
+		free(pos_libre);
+
+}
+
 
 void spawn_perso(Floor * etage){
 	Position stair;
@@ -160,10 +220,20 @@ void spawn_perso(Floor * etage){
 
 	cell_voisine(spawn, stair);
 
-	while(position_type(etage, spawn[i]) == WALL)
+	/* Trouve une place pour faire apparaitre le perso */
+	while(position_type(etage, spawn[i]) != ROOM)
 		i++;
 
 	etage->joueur.pos = spawn[i];
+
+	i++;
+
+	/* Trouve une place pour faire apparaitre le tresor */
+	while(position_type(etage, spawn[i]) != ROOM)
+		i++;
+
+	spawn_elem(etage, TREASURE, spawn[i]);
+
 	printf("char spawn = %d %d\n", etage->joueur.pos.x, etage->joueur.pos.y);
 
 }
@@ -191,10 +261,12 @@ int is_valid(Floor* etage, Position cellpos, Position* toexpand, int len_expand)
 int is_eligible(Floor* etage, Position cellpos){
 	unsigned i, j;
 	unsigned count_dist1 = 0, count_dist2 = 0;
-
 	if( ! is_legal(cellpos.x, cellpos.y)  || position_type(etage, cellpos) == STAIR_UP
-	 	|| (cellpos.x == 0 || cellpos.x == FLOORW) || (cellpos.y == 0 || cellpos.y == FLOORH))
+	 	|| (cellpos.x == 0 || cellpos.x == FLOORW -1) || (cellpos.y == 0 || cellpos.y == FLOORH- 1)){
+
 		return 0;
+	}
+
 
 	/* On verifie le nombre de case salle a distance 1 et 2*/
 	for(i = 1, j = 0; j < 2; i -=1, j +=1){
@@ -211,7 +283,7 @@ int is_eligible(Floor* etage, Position cellpos){
 				count_dist2++;
 		if( is_legal(cellpos.x - i*2,cellpos.y - j*2))
 			if (etage->map[cellpos.y - j*2][cellpos.x - i*2].type != WALL)
-			count_dist2++;
+				count_dist2++;
 
 		if (count_dist1 > 1)
 			return 0;
@@ -229,11 +301,10 @@ int is_eligible(Floor* etage, Position cellpos){
 
 	return count_dist1 == 1 && count_dist2 <= 2;
 
-
 }
 
 int is_legal(int x, int y){
-	return x >= 0 && x < FLOORW + 1  && y >= 0 && y < FLOORH + 1;
+	return x >= 0 && x < FLOORW   && y >= 0 && y < FLOORH;
 }
 
 

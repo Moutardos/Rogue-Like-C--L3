@@ -17,7 +17,7 @@ int treat_action(Floor*etage){
 
 	Position next_pos = next_position(etage, action);
 	Celltype next_type = position_type(etage, next_pos);
-	switch(action.typeaction){
+	switch(action.typeaction){ 
 		case MOVE : 
 			printf("ACTION IS MOVE\n   ");
 
@@ -32,7 +32,7 @@ int treat_action(Floor*etage){
 					etage->map[next_pos.y][next_pos.x].type = TREASUREO;
 					printf("aa\n");
 					open_coffre(etage->map[next_pos.y][next_pos.y]);
-										printf("aa\n");
+										printf("aa\n"); 
 					etage->nb_coffre-=1;
 					update_cell(etage, next_pos);
 				return 1;

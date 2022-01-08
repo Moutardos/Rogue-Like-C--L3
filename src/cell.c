@@ -8,4 +8,7 @@ int is_traversable(Celltype type){
 		case MONSTER : return 0;
 		default : return 1;
 	}
-}
+} 
+
+
+
