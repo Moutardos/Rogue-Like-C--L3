@@ -27,6 +27,7 @@ const char* image_url_monstre(TypeMonstre monstre);
 
 
 int init_vision(Floor* etage);
+void free_graph();
 
 int movement_vision(Floor* etage, Cardinal direction);
 
@@ -50,7 +51,7 @@ void display_cell(Floor* etage, Position pos_abs, int i, int j);
 void draw_char_bars(Personnage pj, int portrait_size);
 
 /* Affiche une barre a la position indique, affichant le pourcentage de completion */
-void draw_bar(int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag);
+void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag);
 /* FONCTION DEBUG, affiche le niveau en ascii
 */
 void affiche_floor_ascii(Floor* etage);

@@ -8,7 +8,7 @@ static MLV_Image* background;
 static MLV_Image* portrait;
 static MLV_Image* off_limit;
 static MLV_Image*** vision_joueur;
-
+static MLV_Image* bars;
 int init_mlv(){
 		unsigned int i = 0;
         
@@ -25,21 +25,41 @@ int init_mlv(){
         MLV_resize_image(off_limit, CELLSIZE , CELLSIZE );
         
         vision_joueur =  malloc(sizeof(MLV_Image**) * (RANGE *2));
-        if( vision_joueur == NULL)
+        if( vision_joueur == NULL){
+        	free(vision_joueur);
         	return 0;
+        }
+        	
+		bars = MLV_create_image(0,0);
 
         for(i = 0; i < RANGE*2; i++){
 			vision_joueur[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
 			if (vision_joueur[i] == NULL){
+				free_vision_joueur(i);
 				return 0;
 			}
         }
 
+        return 1;
+
 ;
 }
 
-
-
+void free_graph(){
+	int i = 0;
+	MLV_clear_window(MLV_COLOR_WHITE);
+	MLV_free_window();
+	if (vision_joueur != NULL){
+		free_vision_joueur(RANGE * 2);
+	}
+}
+void free_vision_joueur(int n){
+	unsigned int i;
+	for (i = 0; i <n; i++){
+		free(vision_joueur[i]);
+	}
+	free(vision_joueur);
+}
 int load_cell( Floor* etage, Position cellpos, MLV_Image** image){
 	Celltype type; 
 	TypeMonstre type_monstre;
@@ -289,6 +309,7 @@ void hud(Floor* etage){
 	int portrait_size = (WINDOWS_W - BORDER_GAME) * 1/3 +1;
 	MLV_draw_image( portrait,BORDER_GAME, 0);
 	draw_char_bars(pj, portrait_size);
+	MLV_actualise_window();
 
 }
 
@@ -298,21 +319,22 @@ void draw_char_bars(Personnage pj, int portrait_size){
 	int start_x = BORDER_GAME + portrait_size;
 	int max_bar = portrait_size*2;
 	int bar_h = portrait_size/3;
+	MLV_free_image(bars);
+	bars = MLV_create_image(max_bar, bar_h*3);
 
-	draw_bar(stat_pj.Hp, get_max_hp(stat_pj), start_x, 0, bar_h, max_bar, MLV_rgba(118,205,68, 255), "HP");
-	draw_bar(stat_pj.Mp, get_max_mp(stat_pj), start_x, bar_h, bar_h, max_bar, MLV_rgba(118,205,217, 255), "MP");
-	draw_bar(pj.xp, xp_to_levelup(pj.level + 1), start_x, bar_h*2, bar_h, max_bar,  MLV_rgba(92,51,217, 255), "XP");
-
-
+	draw_bar_on_image(bars, stat_pj.Hp, get_max_hp(stat_pj), 0, 0, bar_h, max_bar, MLV_rgba(118,205,68, 255), "HP");
+	draw_bar_on_image(bars, stat_pj.Mp, get_max_mp(stat_pj), 0, bar_h, bar_h, max_bar, MLV_rgba(118,205,217, 255), "MP");
+	draw_bar_on_image(bars, pj.xp, xp_to_levelup(pj.level + 1), 0, bar_h*2, bar_h, max_bar,  MLV_rgba(92,51,217, 255), "XP");
+	MLV_draw_image(bars, start_x, 0);
 }
 
-void draw_bar(int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag){
-	float percent = value/max_value;
+void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag){
+	float percent = value/(max_value * 1.0);
 	char stat_txt[999];
-
-	MLV_draw_filled_rectangle(x, y, percent * width, height, color);
+	printf("%s %f %d/%d\n", tag, percent, value, max_value);
+	MLV_draw_filled_rectangle_on_image(x, y, (int) (percent * (float) width), height, color, image);
 	sprintf(stat_txt, "%s: %d/%d", tag, value, max_value);
-	MLV_draw_text(x, y + height/2, stat_txt, MLV_COLOR_WHITE);
+	MLV_draw_text_on_image(x, y + height/2, stat_txt, MLV_COLOR_WHITE, image);
 
 }
 char cell_into_char(Celltype cell_type){

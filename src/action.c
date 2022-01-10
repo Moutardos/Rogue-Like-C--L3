@@ -1,5 +1,6 @@
 #include "action.h"
 
+
 Action control(){
 	Action action;
 	MLV_Keyboard_button key;
@@ -12,8 +13,8 @@ Action control(){
 
 int treat_action(Floor*etage){
 	Action action = control();
+	Position player_pos = etage->joueur.pos;
 	printf("nb coffre :%d\n", etage->nb_coffre);
-	printf("OK WE HERE     ");
 
 	Position next_pos = next_position(etage, action);
 	Celltype next_type = position_type(etage, next_pos);
@@ -21,12 +22,8 @@ int treat_action(Floor*etage){
 		case MOVE : 
 			printf("ACTION IS MOVE\n   ");
 
-
-			if(is_traversable(next_type)){
+			if(is_traversable(next_type))
 				deplacer_joueur(etage, action, next_pos);
-
-				return 1;
-			}
 			else{
 				if(next_type == TREASURE){
 					etage->map[next_pos.y][next_pos.x].type = TREASUREO;
@@ -35,14 +32,16 @@ int treat_action(Floor*etage){
 										printf("aa\n"); 
 					etage->nb_coffre-=1;
 					update_cell(etage, next_pos);
-				return 1;
 				}
 			}
-			break;
+			return 1;
 		case USE :
-
-			break;
-		default : ;
+			switch(position_type(etage, player_pos)){
+				default: return 0;
+			}
+		case MENU :
+			return -1;
+		default : return 0;
 			/* todo */
 	}
 			printf("char at [%d][%d]\n", etage->joueur.pos.y, etage->joueur.pos.x);
@@ -69,9 +68,10 @@ void key_to_action(MLV_Keyboard_button key, Action* action){
 			action->typeaction = USE;
 			break;
 		default:
-			if(key >= MLV_KEYBOARD_0 && key <=  MLV_KEYBOARD_9)
+			if(key >= MLV_KEYBOARD_0 && key <=  MLV_KEYBOARD_9){
 				action->typeaction = ITEM;
-
+			}
+			action->typeaction = IDLE;
 				/* todo ajouter item tudu */
 
 	}
@@ -108,6 +108,10 @@ void deplacer_joueur(Floor* etage, Action action, Position new_pos){
 		etage->joueur.direction = direction;
 		movement_vision(etage, direction);
 	}
-
+ 
 }
 
+void exit_game(Floor* etage){
+	free_graph();
+	free_floor(etage);
+}

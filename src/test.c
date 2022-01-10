@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 int test(){
-	if ( ! test_floor() || !test_affichage())
+	if ( ! test_floor() /* || !test_affichage() */)
 		return 0;
 	return 1;
 }
@@ -26,28 +26,26 @@ int test_floor(){
 		return 0;
 
 	}
-	 
+	free_floor(etage);
 	return 1;
 }
 
 int test_affichage(){
-	unsigned i;
 	Action action;
 	Personnage pj = creation_perso(HUMAN);
 	Floor* etage = init_floor(pj);
 
 	generate_floor(etage);
+	init_vision(etage);
 
 	if (! init_mlv()){
 		fprintf(stderr, "DEBUG : init_mlv couldn't allocate correctly ! exiting..\n");
+		MLV_free_window();
 		return 0;
 
 	} 
-	init_vision(etage);
 	 
-	while (1){
-		affiche_floor_ascii(etage);
-		treat_action(etage);
-	}
+
+	exit_game(etage);
 	return 1;
 }

@@ -7,7 +7,7 @@
 
 /* Move vers un ennemie -> Combat */
 typedef enum typeaction{
-	MOVE, USE, ITEM, MENU
+	MOVE, USE, ITEM, MENU, IDLE
 }Typeaction;
 
 
@@ -19,7 +19,9 @@ typedef struct action{
 Action control();
 
 /* Selon le contexte et l'action faite par le joueur, produit un evenement
-   Retour : 1 -> deplacement
+   Retour : 1 -> le tour du joueur est passe
+   			0 -> c'est toujours le tour du joueur
+   			-1 -> exit game
 */
 int treat_action(Floor*etage);
   
@@ -33,5 +35,7 @@ Position next_position(Floor* etage, Action action);
 /* Deplace la position du personnage jouable dans l'etage selon la direction */
 void deplacer_joueur(Floor* etage, Action action, Position new_pos);
 
+/* Libere les donnes alloue avant de quitter le jeu */ 
+void exit_game(Floor* etage);
 
 #endif

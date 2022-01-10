@@ -1,9 +1,8 @@
 #ifndef MONSTRE
 #define MONSTRE
 
-#include "cell.h"
 #define MONSTER_MAX 30
-
+#include "attribut.h"
 typedef enum {
 	ALIEN
 }TypeMonstre;
@@ -16,9 +15,10 @@ typedef struct monstre{
 	float miss;
 	float acc;
 	int vitesse;
+	int fight;
 
 }Monstre;
 
 Monstre init_monstre(TypeMonstre type, int dif);
-
+void monstre_fight(Monstre* monstre, Attribut* joueur_stat);
 #endif

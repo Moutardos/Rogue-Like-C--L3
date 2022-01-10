@@ -33,4 +33,6 @@ typedef struct position{
 /* Renvoie l'information si la cellule peut etre traverse par le joueur */
 int is_traversable(Celltype type);
 
+/* Renvoie 1 si les coordonees sont egaux, sinon 0 */
+int pos_is_equals(Position pos1, Position pos2);
 #endif

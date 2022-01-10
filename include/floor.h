@@ -21,6 +21,8 @@ typedef struct floor{
 */
 Floor* init_floor(Personnage pj);
 
+void free_floor(Floor* etage);
+
 /* Genere un etage avec des salles vides respectant les consignes 
 */
 int generate_floor(Floor* etage);
@@ -39,7 +41,7 @@ void spawn_elem(Floor* etage, Celltype type, Position pos);
 */
 int is_eligible(Floor* etage, Position cellpos);
 
-/* Renvoie 1 si les coordonees sont dans les dimmensions de l'etage
+/* Renvoie 1 si les coordonees sont dans les dimensions de l'etage
 */
 int is_legal(int x, int y);
 
@@ -61,15 +63,19 @@ Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type);
    qu'une seule voisine room dans lequel va etre le gardien
    /!\ detruit la liste en parametre
 */
-void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre  );
+void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre, int nb_salles  );
 
 /* Prend une element au hasard d'un tableau de position, le fait apparaitre et le supprime
    de la liste */
 Position spawn_elem_in_list(Floor* etage, Celltype type, int* len, Position* pos_libre);
 
+/* Renvoie la premiere cellule voisine a pos qui est du type indique.
+   Mettre 1 si vous cherchez le joueur, 0 sinon */
+Position voisine_type(Floor* etage, Position pos, Celltype type, int is_joueur);
 
 
-
+/* Renvoie le nombre de case voisine a cellpos dans le terrain et les stockent dans voisines*/
+int cell_voisine(Position* voisines, Position cellpos);
 /* Retourne le type de cell dans la position pos de l'etage
 */
 Celltype position_type(Floor* etage, Position pos);
