@@ -9,6 +9,7 @@ static MLV_Image* portrait;
 static MLV_Image* off_limit;
 static MLV_Image*** vision_joueur;
 static MLV_Image* bars;
+
 int init_mlv(){
 		unsigned int i = 0;
         

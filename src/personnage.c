@@ -11,5 +11,10 @@ Personnage creation_perso(Race race){
 }
 
 int xp_to_levelup(int level){
-    return 100;
+    return 350 + 50*level;
+}
+void level_up(Personnage* pj, int* stat_lvlup){
+    pj->stat.Atk += stat_lvlup[0];
+    pj->stat.Int += stat_lvlup[1];
+    pj->stat.Def += stat_lvlup[2];
 }

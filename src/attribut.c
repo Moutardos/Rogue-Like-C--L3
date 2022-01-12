@@ -25,3 +25,4 @@ int get_max_hp(Attribut stat){
 int get_max_mp(Attribut stat){
 	return stat.Int * 10 - 50;
 }
+

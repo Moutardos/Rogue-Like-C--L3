@@ -23,6 +23,7 @@ void monstre_fight(Monstre* monstre, Attribut* joueur_stat){
 			joueur_stat->Hp -= monstre->atk;
 			printf("hit ! joueur hp :%d\n", joueur_stat->Hp );
 		}
+	
 					printf(" miss    ");
 	}
 	else {

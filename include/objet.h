@@ -4,9 +4,8 @@
 #include "attribut.h"
 typedef struct objet{
 	int consomable;
-	union type{
-		Attribut bonus;
-		/* sort */
-	}
+	Attribut bonus;
+	int active;
+	int remaining_turn;
 }Objet;
 #endif
