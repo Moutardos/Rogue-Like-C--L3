@@ -14,7 +14,7 @@ Action control(){
 int treat_action(Floor*etage){
 	Action action = control();
 	Position player_pos = etage->joueur.pos;
-
+	Monstre* monstre;
 	Position next_pos = next_position(etage, action);
 	Celltype next_type = position_type(etage, next_pos);
 	switch(action.typeaction){ 
@@ -32,6 +32,10 @@ int treat_action(Floor*etage){
 					etage->nb_coffre-=1;
 					update_cell(etage, next_pos);
 				}
+				if (next_type == MONSTER){
+					monstre = &(etage->map[next_pos.y][next_pos.x].entity.monstre);
+					hit_enemy(etage, monstre);
+				}
 			}
 			return 1;
 		case USE :
@@ -40,6 +44,8 @@ int treat_action(Floor*etage){
 			}
 		case MENU :
 			return -1;
+		case ITEM :
+			return 0;
 		default : return 0;
 			/* todo */
 	}

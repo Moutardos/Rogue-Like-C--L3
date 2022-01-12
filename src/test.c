@@ -3,11 +3,12 @@
 #include "affichage.h"
 #include "personnage.h"
 #include "action.h"
+#include "objet.h"
 #include <stddef.h>
 #include <stdio.h>
 
 int test(){
-	if ( ! test_floor() /* || !test_affichage() */)
+	if ( ! test_floor() /* || !test_affichage() */  || !test_objet())
 		return 0;
 	return 1;
 }
@@ -48,4 +49,16 @@ int test_affichage(){
 
 	exit_game(etage);
 	return 1;
+}
+
+int test_objet(){
+	int i;
+	Objet sword;
+	for(i = 1; i < 20; i++){
+		printf("ETAGE %d    \n",i);
+		sword = generate_weapon(i);
+		print_weapon(sword);
+	}
+	return 1;
+ 
 }

@@ -18,3 +18,7 @@ void level_up(Personnage* pj, int* stat_lvlup){
     pj->stat.Int += stat_lvlup[1];
     pj->stat.Def += stat_lvlup[2];
 }
+
+void hit_enemy(Personnage pj,Monstre* monstre){
+    
+}

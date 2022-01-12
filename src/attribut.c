@@ -26,3 +26,10 @@ int get_max_mp(Attribut stat){
 	return stat.Int * 10 - 50;
 }
 
+float rand_percent(int i, int j){
+	int pourcentage = rand() % (j + 1);
+	if (pourcentage < i)
+		pourcentage = i;
+
+	return (pourcentage)/100.0;
+}

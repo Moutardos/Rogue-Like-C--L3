@@ -31,5 +31,6 @@ int get_max_hp(Attribut stat);
 int get_max_mp(Attribut stat);
 
 
-
+/* Renvoie un pourcentage aleatoire entre i et j */
+float rand_percent(int i, int j);
 #endif

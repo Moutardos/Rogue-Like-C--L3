@@ -78,7 +78,6 @@ int generate_floor(Floor* etage){
 
 	}
 	spawn_perso(etage);
-    printf("1char spawn at [%d][%d]\n", etage->joueur.pos.y, etage->joueur.pos.x);
 
     affiche_floor_ascii(etage);
 		generate_elem(etage);
@@ -148,19 +147,15 @@ void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre, int nb_
 		pos = pos_libre[i];
 		countV = 0;
 		cell_voisine(voisines, pos);
-				printf("checking %d %d ", pos.y, pos.x);
 
 		for (j = 0; j < 4; j++){
 			if (position_type(etage, voisines[j]) == ROOM)
 				countV++;
 		}
-		printf("i got %d voisines room", countV);
 		if (countV == 1){
-					printf("im good  ");
 			spawnable_treasure[len_treasure] = pos;
 			len_treasure++;
 		}
-		printf("\n");
 	}
 	/* Spawn them at 5 random position */
 
@@ -220,7 +215,6 @@ Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type){
 			}
 		}
 	}
-    printf("creation de room : %d room \n", count);
 	*len = count;
 
 	return result;
@@ -321,7 +315,6 @@ void enemy_turn(Floor* etage){
 	int len_voisines = cell_voisine(voisines, pos_joueur);
 	Monstre* monstre;
 	Attribut* player_stat = &(etage->joueur.stat);
-	printf("len voisine = %d\n", len_voisines);
 	for(i = 0; i < len_voisines; i++){
 		if(position_type(etage, voisines[i]) == MONSTER){
 			monstre = &(etage->map[voisines[i].y][voisines[i].x].entity.monstre);
@@ -330,6 +323,7 @@ void enemy_turn(Floor* etage){
 	}
 	
 }
+
 
 
 int cell_voisine(Position* voisines, Position cellpos){

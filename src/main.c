@@ -1,5 +1,5 @@
 #include "test.h"
-#include "attribut.h";
+#include "attribut.h"
 #include "affichage.h"
 #include "floor.h"
 #include "action.h"
@@ -13,7 +13,6 @@ int main(int argc, char const *argv[]){
 
 	if (!init_mlv())
 		return 1;
-
 	generate_floor(etage);
 	init_vision(etage);
 
@@ -23,7 +22,7 @@ int main(int argc, char const *argv[]){
 			continue;
 		affiche_floor_ascii(etage);
 		enemy_turn(etage); /* todo : enemy return la position du fight si besoin puis le fait */
-				hud(etage);
+		hud(etage);
 
 	}
 	exit_game(etage);

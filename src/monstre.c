@@ -25,19 +25,15 @@ void monstre_fight(Monstre* monstre, Attribut* joueur_stat){
 		
 		/* HIT */
 		if (roll > monstre->miss){
-			percent = (120 - (rand() % 40))/(100 * 1.0);
-						printf("percent = %f  ",percent);
+			percent = rand_percent(80,120);
 			damage = (int) (monstre->atk * (float)percent );
-			printf("damgage= %d  ",(int) (monstre->atk*(float)percent));
 			/* CRIT */
 			if(roll >= 95)
 				damage = damage *3;
 			
 			joueur_stat->Hp -= damage;
-			printf("hit ! joueur hp :%d\n", joueur_stat->Hp );
 		}
 
-					printf(" miss    ");
 	}
 	else {
 					printf("monstre got aggroo   ");
