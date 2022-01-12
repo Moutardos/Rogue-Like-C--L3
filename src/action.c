@@ -14,7 +14,6 @@ Action control(){
 int treat_action(Floor*etage){
 	Action action = control();
 	Position player_pos = etage->joueur.pos;
-	printf("nb coffre :%d\n", etage->nb_coffre);
 
 	Position next_pos = next_position(etage, action);
 	Celltype next_type = position_type(etage, next_pos);

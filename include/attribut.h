@@ -16,6 +16,9 @@ typedef enum {
 } Race;
 
 
+typedef enum{
+	Atk, Int, Def
+} LvlUpStat;
 /* Renvoie les attributs du personnage jouable selon sa race */
 Attribut init_PJ_attribut(Race race);
 
