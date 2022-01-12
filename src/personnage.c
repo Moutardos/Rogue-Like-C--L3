@@ -7,6 +7,12 @@ Personnage creation_perso(Race race){
     pj.xp = 0;
     pj.level = 1;
     pj.direction = NORTH;
+    int i;
+    for(i = 0; i < 10; i++)
+		pj.inventory[i] = NULL;
+	pj.gear[0] = NULL;
+	pj.gear[1] = NULL;
+    
     return pj;
 }
 

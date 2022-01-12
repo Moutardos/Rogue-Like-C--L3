@@ -1,6 +1,8 @@
 #ifndef PERSONNAGE
 #define PERSONNAGE
 
+#include <stddef.h>
+
 #include "attribut.h"
 #include "cell.h"
 typedef struct personnage{
@@ -10,6 +12,8 @@ typedef struct personnage{
 	Cardinal direction;
 	int level;
 	int xp;
+	Objet* inventory[10];
+	Objet* gear[2];
 }Personnage;
 
 Personnage creation_perso(Race race);

@@ -6,6 +6,7 @@
 static MLV_Image* image_perso;
 static MLV_Image* background;
 static MLV_Image* portrait;
+static MLV_Image* inventory;
 static MLV_Image* off_limit;
 static MLV_Image*** vision_joueur;
 static MLV_Image* bars;
@@ -24,6 +25,9 @@ int init_mlv(){
         
         portrait = MLV_load_image("art/hud/portrait.png");
         MLV_resize_image(off_limit, CELLSIZE , CELLSIZE );
+        
+        inventory = MLV_load_image("art/hud/inventory.png");
+        MLV_resize_image(inventory, (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
         
         vision_joueur =  malloc(sizeof(MLV_Image**) * (RANGE *2));
         if( vision_joueur == NULL){
@@ -310,8 +314,21 @@ void hud(Floor* etage){
 	int portrait_size = (WINDOWS_W - BORDER_GAME) * 1/3 +1;
 	MLV_draw_image( portrait,BORDER_GAME, 0);
 	draw_char_bars(pj, portrait_size);
+	
+	/* On affiche le visuel du sac à dos et de l'arme/armure équipées */
+	int i, j;
+	MLV_Font* font = MLV_load_font( "art/fonts/arial.ttf" , 20 );
+	for(i = 0; i < 3; i++)
+		for(j = 0; j < 3; j++) {
+			MLV_draw_image(inventory, BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1));
+			MLV_draw_text_with_font(BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3 + 5, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1) + 5, "%d", font, MLV_COLOR_WHITE, i*3 + j);
+		}
+	MLV_draw_image(inventory, BORDER_GAME, (WINDOWS_W - BORDER_GAME) / 3 * 4);
+	MLV_draw_text_with_font(BORDER_GAME + 5, (WINDOWS_W - BORDER_GAME) / 3 * 4 + 5, "9", font, MLV_COLOR_WHITE);
+	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+	MLV_draw_image(inventory, BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+	
 	MLV_actualise_window();
-
 }
 
 void draw_char_bars(Personnage pj, int portrait_size){
