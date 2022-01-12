@@ -24,13 +24,11 @@ Floor* init_floor(Personnage pj){
 	etage->nb_monstre = 0;
 	etage->nb_coffre = 0;
 
-	etage->monstres_pos = malloc(sizeof(Position) * MONSTER_MAX);
 	return etage;
 
 }
 
 void free_floor(Floor *etage){
-	free(etage->monstres_pos);
 	free(etage);
 }
 
@@ -125,7 +123,6 @@ void spawn_elem(Floor* etage, Celltype type, Position pos){
 			break;
 		case MONSTER :
 			etage->map[pos.y][pos.x].entity.monstre = init_monstre(ALIEN, etage->number);
-			etage->monstres_pos[etage->nb_monstre] = pos;
 			etage->nb_monstre++;
 			break;
 		default:
@@ -170,7 +167,7 @@ void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre, int nb_
 	for(i = 0; i < nb_salles; i++){
 		index = rand() % len_treasure;
 		pos = spawnable_treasure[index];
-		pos_monstre = voisine_type(etage, pos, ROOM,0);
+		pos_monstre = voisine_type(etage, pos, ROOM);
 		spawn_elem(etage, TREASURE, pos);
 		spawn_elem(etage, MONSTER, pos_monstre);
 		remove_pos(spawnable_treasure, index, &len_treasure);
@@ -190,11 +187,11 @@ void spawn_perso(Floor * etage){
 
 
 	/* Trouve une place pour faire apparaitre le perso */
-	etage->joueur.pos = voisine_type(etage, stair, ROOM, 0);
+	etage->joueur.pos = voisine_type(etage, stair, ROOM);
 
 
 	/* Trouve une place pour faire apparaitre le tresor */
-	treasure = voisine_type(etage, stair, ROOM, 0);
+	treasure = voisine_type(etage, stair, ROOM);
 
 
 	spawn_elem(etage, TREASURE, treasure);
@@ -213,7 +210,6 @@ Position* list_of_tiles(Floor* etage, int* len, int range, Celltype type){
 	for(j = 0; j < FLOORH; j++){
 		for (i = 0; i < FLOORW; i++){
 			if ( abs(player_pos.x - i) > range || abs(player_pos.y - j) > range){
-                printf("%d %d is good : %d de distance du perso",  j, i, abs(player_pos.x - range));
 				pos.x = i;
 				pos.y = j;
 				if (position_type(etage, pos) == type){
@@ -251,15 +247,15 @@ int is_valid(Floor* etage, Position cellpos, Position* toexpand, int len_expand)
 
 }
 
-Position voisine_type(Floor* etage, Position pos, Celltype type, int is_joueur){
+Position voisine_type(Floor* etage, Position pos, Celltype type){
 	int i = 0;
 	Position voisines[4];
 	Position pos_joueur = etage->joueur.pos;
 	int len = cell_voisine(voisines, pos);
 
 	for (i = 0; i < len; i++){
-			/* La position du voisin est du bon type et le joueur n'y est pas OU le joueur y est et est attendu */ 
-		if (position_type(etage, voisines[i]) == type && (pos_is_equals(voisines[i], pos_joueur) == is_joueur))
+			/* La position du voisin est du bon type et le joueur n'y est pas */ 
+		if (position_type(etage, voisines[i]) == type && (!pos_is_equals(voisines[i], pos_joueur)))
 			break;
 	}
 
@@ -320,20 +316,19 @@ int is_legal(int x, int y){
 
 void enemy_turn(Floor* etage){
 	int i;
-	Position pos_monstre;
-	Monstre* monstre;
 	Position pos_joueur = etage->joueur.pos;
+	Position voisines[4];
+	int len_voisines = cell_voisine(voisines, pos_joueur);
+	Monstre* monstre;
 	Attribut* player_stat = &(etage->joueur.stat);
-	for(i = 0; i < etage->nb_monstre; i++){
-		
-		pos_monstre = etage->monstres_pos[i];
-		if(pos_is_equals(voisine_type(etage, pos_monstre, ROOM, 1), pos_joueur)){
-			printf(" OH LA BAGARE  ");
-			monstre = &(etage->map[pos_monstre.y][pos_monstre.x].entity.monstre);
-			monstre_fight(monstre, player_stat); /* todo: ... probably  a better way */
+	printf("len voisine = %d\n", len_voisines);
+	for(i = 0; i < len_voisines; i++){
+		if(position_type(etage, voisines[i]) == MONSTER){
+			monstre = &(etage->map[voisines[i].y][voisines[i].x].entity.monstre);
+			monstre_fight(monstre, player_stat);
 		}
-
 	}
+	
 }
 
 

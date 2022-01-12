@@ -69,9 +69,8 @@ void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre, int nb_
    de la liste */
 Position spawn_elem_in_list(Floor* etage, Celltype type, int* len, Position* pos_libre);
 
-/* Renvoie la premiere cellule voisine a pos qui est du type indique.
-   Mettre 1 si vous cherchez le joueur, 0 sinon */
-Position voisine_type(Floor* etage, Position pos, Celltype type, int is_joueur);
+/* Renvoie la premiere cellule voisine a pos qui est du type indique.*/
+Position voisine_type(Floor* etage, Position pos, Celltype type);
 
 
 /* Renvoie le nombre de case voisine a cellpos dans le terrain et les stockent dans voisines*/
