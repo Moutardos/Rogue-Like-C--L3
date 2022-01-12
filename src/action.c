@@ -1,4 +1,5 @@
 #include "action.h"
+#include "coffre.h"
 
 
 Action control(){
@@ -15,6 +16,7 @@ int treat_action(Floor*etage){
 	Action action = control();
 	Position player_pos = etage->joueur.pos;
 	Monstre* monstre;
+	Personnage* pj = &etage->joueur;
 	Position next_pos = next_position(etage, action);
 	Celltype next_type = position_type(etage, next_pos);
 	switch(action.typeaction){ 
@@ -26,10 +28,8 @@ int treat_action(Floor*etage){
 			else{
 				if(next_type == TREASURE){
 					etage->map[next_pos.y][next_pos.x].type = TREASUREO;
-					printf("aa\n");
-					open_coffre(etage->map[next_pos.y][next_pos.y]);
-										printf("aa\n"); 
 					etage->nb_coffre-=1;
+					treasure_opening(pj, etage->map[next_pos.y][next_pos.y].entity.coffre.contenu);
 					update_cell(etage, next_pos);
 				}
 				if (next_type == MONSTER){
@@ -93,7 +93,22 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 }
 
 
+int treasure_opening(Personnage* pj, Objet* loot){
+	Action action = control();
+	Cardinal direction;
+	while(action.typeaction != MENU){
+		direction = action.direction;
+		switch(action.typeaction){
+			case MOVE:
+				break;
+			case USE:
+				break;
+		}
 
+		action = control();
+	}
+
+}
 Position next_position(Floor* etage, Action action){
 	Cardinal direction = action.direction;
 	Position next_pos = etage->joueur.pos;

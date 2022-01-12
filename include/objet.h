@@ -2,6 +2,7 @@
 #define OBJET
 
 #include "attribut.h"
+#define NB_POTIONS_ACTIVE 3
 
 typedef enum typeObjet{
 	ARMOR, POTION, WAND, WEAPON

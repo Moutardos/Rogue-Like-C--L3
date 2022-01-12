@@ -35,6 +35,9 @@ Position next_position(Floor* etage, Action action);
 /* Deplace la position du personnage jouable dans l'etage selon la direction */
 void deplacer_joueur(Floor* etage, Action action, Position new_pos);
 
+/* Permet au joueur de naviger dans la selection de loot du tresor */
+int treasure_opening(Personnage* pj, Objet* loot);
+
 /* Libere les donnes alloue avant de quitter le jeu */ 
 void exit_game(Floor* etage);
 

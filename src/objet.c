@@ -15,4 +15,4 @@ Objet generate_weapon(int etage){
 
 void print_weapon(Objet weapon){
 	printf("WEAPON :: \nQUALITY %d ATK %d\n\n",weapon.specificite.qualite, weapon.bonus.Atk);
-}
+} 

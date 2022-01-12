@@ -12,8 +12,10 @@ typedef struct personnage{
 	Cardinal direction;
 	int level;
 	int xp;
-	Objet* inventory[10];
-	Objet* gear[2];
+	Objet inventory[10];
+	Objet gear[2];
+	int len_inventory;
+	Potion active_potions[NB_POTIONS_ACTIVE];
 }Personnage;
 
 Personnage creation_perso(Race race);

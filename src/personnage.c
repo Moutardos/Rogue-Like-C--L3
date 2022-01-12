@@ -8,10 +8,8 @@ Personnage creation_perso(Race race){
     pj.level = 1;
     pj.direction = NORTH;
     int i;
-    for(i = 0; i < 10; i++)
-		pj.inventory[i] = NULL;
-	pj.gear[0] = NULL;
-	pj.gear[1] = NULL;
+	pj.gear[0] = generate_weapon(1); /* arme */
+	pj.gear[1] = generate_weapon(1); /* armure */
     
     return pj;
 }
@@ -24,10 +22,8 @@ void level_up(Personnage* pj, int* stat_lvlup){
     pj->stat.Int += stat_lvlup[1];
     pj->stat.Def += stat_lvlup[2];
 }
-<<<<<<< HEAD
-=======
 
-void hit_enemy(Personnage pj,Monstre* monstre){
+
+int hit_enemy(Personnage pj,Monstre* monstre){
     
 }
->>>>>>> 51221625ffae9e9bfede0175a9a80dfd4e7c2b17
