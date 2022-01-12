@@ -6,7 +6,7 @@ Monstre init_monstre(TypeMonstre type, int dif){
 	switch(type){
 		case ALIEN:
 			new_monstre.hp = 100;
-			new_monstre.atk = 2;
+			new_monstre.atk = 6;
 			new_monstre.miss = 1;
 			new_monstre.acc = 100;
 			new_monstre.vitesse = 1;
@@ -16,15 +16,24 @@ Monstre init_monstre(TypeMonstre type, int dif){
 }
 
 void monstre_fight(Monstre* monstre, Attribut* joueur_stat){
-	int roll = rand() % 100;
-
-	if (monstre->fight == 1){
-		if (roll > monstre->miss){
-			joueur_stat->Hp -= monstre->atk;
-			printf("hit ! joueur hp :%d\n", joueur_stat->Hp );
-		}
+	int roll = rand() % 101;
+	int damage;
+	float percent;
 	
-					printf(" miss    ");
+	/* AGGRO */
+	if (monstre->fight == 1){
+		
+		/* HIT */
+		if (roll > monstre->miss){
+			percent = rand_percent(80,120);
+			damage = (int) (monstre->atk * (float)percent );
+			/* CRIT */
+			if(roll >= 95)
+				damage = damage *3;
+			
+			joueur_stat->Hp -= damage;
+		}
+
 	}
 	else {
 					printf("monstre got aggroo   ");

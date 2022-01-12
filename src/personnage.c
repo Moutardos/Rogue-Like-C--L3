@@ -24,3 +24,10 @@ void level_up(Personnage* pj, int* stat_lvlup){
     pj->stat.Int += stat_lvlup[1];
     pj->stat.Def += stat_lvlup[2];
 }
+<<<<<<< HEAD
+=======
+
+void hit_enemy(Personnage pj,Monstre* monstre){
+    
+}
+>>>>>>> 51221625ffae9e9bfede0175a9a80dfd4e7c2b17
