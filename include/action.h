@@ -41,4 +41,6 @@ int treasure_opening(Personnage* pj, Objet* loot);
 /* Libere les donnes alloue avant de quitter le jeu */ 
 void exit_game(Floor* etage);
 
+/* Permet au joueur de choisir visuelement quelles stats augmenter */
+int* choose_stats_lvlup(Personnage* pj, int* stat);
 #endif

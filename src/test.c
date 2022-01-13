@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 int test(){
-	if ( ! test_floor() /* || !test_affichage() */  || !test_objet())
+	if ( ! test_floor() /* || !test_affichage() */ || !test_objet() ||  !test_action()  )
 		return 0;
 	return 1;
 }
@@ -61,4 +61,20 @@ int test_objet(){
 	}
 	return 1;
  
+}
+
+int test_action(){
+	Personnage pj = creation_perso(HUMAN);
+	Floor* etage = init_floor(pj);
+		int stat[3] = { 0 };
+	init_mlv();
+	while(1){
+		printf("PJ: %d ATK %d INT %d DEF\n", pj.stat.Atk,  pj.stat.Int,  pj.stat.Def);
+		printf("LVLUP !!\n");
+				choose_stats_lvlup(&pj, stat);
+		level_up(&pj,stat);
+		printf("PJ: %d ATK %d INT %d DEF\n", pj.stat.Atk,  pj.stat.Int,  pj.stat.Def);
+
+	}
+	return 1;
 }

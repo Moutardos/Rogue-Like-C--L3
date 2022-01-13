@@ -118,6 +118,46 @@ int treasure_opening(Personnage* pj, Objet* loot){
 	}
 
 }
+
+int* choose_stats_lvlup(Personnage* pj, int* stat){
+	Action action = control();
+	Cardinal direction;
+	int index = 0;
+	int total = 0;
+		printf("#####\n%d ATK %c\n%d INT %c\n%d DEF %c\n#####\n",stat[0],index==0?'X':' ',stat[1],index==1?'X':' ',stat[2],index==2?'X':' ');
+
+	while(action.typeaction != USE || total !=3){
+		direction = action.direction;
+		if (action.typeaction == MOVE){
+			switch(direction){
+				case EAST:
+					if(total < 3){
+						total++;
+						stat[index]++;
+					}
+					break;
+				case WEST:
+					if (total > 0){
+						total--;
+						stat[index]--;
+					}
+					break;
+				case NORTH:
+					if (index > 0)
+						index--;
+					break;
+				case SOUTH:
+					if (index < 2)
+						index++;
+					break;
+				}
+		}
+		printf("#####\n%d ATK %c\n%d INT %c\n%d DEF %c\n#####\n",stat[0],index==0?'X':' ',stat[1],index==1?'X':' ',stat[2],index==2?'X':' ');
+		action = control();
+	}
+	return stat;
+
+}
 Position next_position(Floor* etage, Action action){
 	Cardinal direction = action.direction;
 	Position next_pos = etage->joueur.pos;
