@@ -11,6 +11,7 @@ static MLV_Image* inv_content[12];
 static MLV_Image* off_limit;
 static MLV_Image*** vision_joueur;
 static MLV_Image* bars;
+static MLV_Image* ennemy_hp;
 
 int init_mlv(){
 		unsigned int i = 0;
@@ -37,7 +38,7 @@ int init_mlv(){
         }
         	
 		bars = MLV_create_image(0,0);
-
+		ennemy_hp = MLV_create_image(0,0);
         for(i = 0; i < RANGE*2; i++){
 			vision_joueur[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
 			if (vision_joueur[i] == NULL){
@@ -324,6 +325,7 @@ void update_cell(Floor* etage, Position pos){
 	MLV_actualise_window();
 
 }
+
 void hud(Floor* etage){
 	char stat_txt[999];
 	Position start;
@@ -378,13 +380,23 @@ void draw_char_bars(Personnage pj, int portrait_size){
 	MLV_draw_image(bars, start_x, 0);
 }
 
+void draw_bar_on_ennemy(Floor* etage, Position pos_monstre, Monstre monstre){
+	Position pos_sprite = absolute_pos_to_vision_pos(etage, pos_monstre);
+	MLV_free_image(ennemy_hp);
+	ennemy_hp= MLV_create_image(CELLSIZE, 4);
+	draw_bar_on_image(ennemy_hp, monstre.hp, monstre.max_hp, 0,0, 4, CELLSIZE, MLV_COLOR_GREEN,NULL);
+	MLV_draw_image(ennemy_hp, CELLSIZE * pos_sprite.x, CELLSIZE * pos_sprite.y + CELLSIZE/4);
+	MLV_actualise_window();
+}
 void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag){
 	float percent = value/(max_value * 1.0);
 	char stat_txt[999];
 	printf("%s %f %d/%d\n", tag, percent, value, max_value);
 	MLV_draw_filled_rectangle_on_image(x, y, (int) (percent * (float) width), height, color, image);
-	sprintf(stat_txt, "%s: %d/%d", tag, value, max_value);
-	MLV_draw_text_on_image(x, y + height/2, stat_txt, MLV_COLOR_WHITE, image);
+	if (tag != NULL){
+		sprintf(stat_txt, "%s: %d/%d", tag, value, max_value);
+		MLV_draw_text_on_image(x, y + height/2, stat_txt, MLV_COLOR_WHITE, image);
+	}
 
 }
 void draw_inventory(Personnage pj){

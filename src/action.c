@@ -34,7 +34,13 @@ int treat_action(Floor*etage){
 				}
 				if (next_type == MONSTER){
 					monstre = &(etage->map[next_pos.y][next_pos.x].entity.monstre);
-					hit_enemy(etage, monstre);
+					switch(hit_enemy(etage->joueur, monstre)){
+						case -1: return 0;
+						case 1: 
+							etage->map[next_pos.y][next_pos.x].type = ROOM;
+							update_cell(etage, next_pos);
+					}
+					draw_bar_on_ennemy(etage, next_pos, *monstre);
 				}
 			}
 			return 1;

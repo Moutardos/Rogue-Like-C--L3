@@ -11,6 +11,7 @@ typedef enum {
 typedef struct monstre{
 	TypeMonstre type;
 	int hp;
+	int max_hp;
 	int atk;
 	float miss;
 	float acc;

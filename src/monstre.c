@@ -5,12 +5,13 @@ Monstre init_monstre(TypeMonstre type, int dif){
 	new_monstre.type = type;
 	switch(type){
 		case ALIEN:
-			new_monstre.hp = 90 + dif*10;
-			new_monstre.atk = 6 + dif*5;
+			new_monstre.hp = 90 + (dif*10 * rand_percent(60,100));
+			new_monstre.atk = 6 + (dif*10 * rand_percent(60,100));
 			new_monstre.miss = 1;
-			new_monstre.acc = 100;
+			new_monstre.acc = 1;
 			new_monstre.vitesse = 1;
 	}
+	new_monstre.max_hp = new_monstre.hp;
 	new_monstre.fight = 0;
 	return new_monstre;
 }
@@ -24,7 +25,7 @@ void monstre_fight(Monstre* monstre, Attribut* joueur_stat){
 	if (monstre->fight == 1){
 		
 		/* HIT */
-		if (roll > monstre->miss){
+		if (roll > monstre->acc){
 			percent = rand_percent(80,120);
 			damage = (int) (monstre->atk * (float)percent );
 			/* CRIT */

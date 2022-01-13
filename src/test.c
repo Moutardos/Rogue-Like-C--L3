@@ -27,7 +27,7 @@ int test_floor(){
 		return 0;
 
 	}
-	free_floor(etage);
+	free_floor(etage);  
 	return 1;
 }
 

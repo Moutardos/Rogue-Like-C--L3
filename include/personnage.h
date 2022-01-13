@@ -27,4 +27,10 @@ int xp_to_levelup(int level);
 
 /* Augmente les 3 stats ([0] = atk, [1] = int, [2] = def) selon ce qu'a choisis le joueur */
 void level_up(Personnage* pj, int* stat_lvlup);
+
+/* Le joueur frappe l'ennemie.
+   -1 -> pas assez de mp pour la wand
+   1 -> kill
+   0 -> monstre encore vivant */
+int hit_enemy(Personnage pj,Monstre* monstre);
 #endif

@@ -25,5 +25,33 @@ void level_up(Personnage* pj, int* stat_lvlup){
 
 
 int hit_enemy(Personnage pj,Monstre* monstre){
+    int roll = rand() % 101;
+    Attribut stat_pj = pj.stat;
+    int damage;
+    float percent = rand_percent(80,120);
     
+    /* ARME PHYSIQUE */
+    if (pj.gear[0].type == WEAPON)
+        damage =  (int) ((stat_pj.Atk + pj.gear[0].bonus.Atk) * (float)percent);
+
+    /* WAND */
+    else if (pj.gear[0].type == WAND){
+        if(stat_pj.Mp >= 20)
+            damage = (int) ((stat_pj.Int + pj.gear[0].bonus.Int) * 2);
+        else
+            return -1;
+    }
+
+    /* HIT */
+    if (roll > monstre->miss){
+        if(roll >= 95)
+            damage = damage *3;
+            
+        monstre->hp -= damage;
+    }
+
+    if(monstre->hp <= 0)
+        return 1;
+    return 0;
+
 }
