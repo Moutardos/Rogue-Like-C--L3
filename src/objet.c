@@ -22,7 +22,7 @@ Objet generate_armor(int etage){
 	int bonus;
 	armor.type = ARMOR;
 	armor.specificite.qualite = 1 + rand() % etage;
-	def =  5 * armor.specificite.qualite;
+	def =  1 * armor.specificite.qualite;
 	bonus = def * rand_percent(0,20);
 	armor.bonus.Def = def + bonus;
 	return armor;
@@ -30,3 +30,19 @@ Objet generate_armor(int etage){
 void print_armor(Objet armor){
 	printf("ARMOR :: \nQUALITY %d DEF %d\n\n", armor.specificite.qualite, armor.bonus.Def);
 }
+
+Objet generate_objet(int etage, TypeObjet type){
+	Objet obj;
+	int val;
+	int bonus;
+	obj.type = type;
+	obj.specificite.qualite = 1 + rand() % etage;
+	switch(type) {
+		case POTION:	obj.specificite.potion.type = rand() % 5; break;
+		case WEAPON:	obj.bonus.Atk = (5 * obj.specificite.qualite) * (1 + rand_percent(0, 20)); break;
+		case WAND:		obj.bonus.Int = (3 * obj.specificite.qualite) * (1 + rand_percent(0, 20)); break;
+		case ARMOR:		obj.bonus.Def = (1 * obj.specificite.qualite) * (1 + rand_percent(0, 20)); break;
+	}
+	return obj;
+}
+

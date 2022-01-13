@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 int test(){
-	if ( ! test_floor() /* || !test_affichage() */ || !test_objet() ||  !test_action()  )
+	if ( ! test_floor() /* || !test_affichage() */ || !test_objet() /*||  !test_action()*/  )
 		return 0;
 	return 1;
 }

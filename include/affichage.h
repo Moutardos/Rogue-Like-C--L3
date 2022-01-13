@@ -57,7 +57,7 @@ void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y,
 void draw_inventory(Personnage pj);
 
 /* Affiche un coffre ouvert et son contenu */
-void draw_chest(Objet content[]);
+void draw_chest(Objet content[], int size);
 
 /* FONCTION DEBUG, affiche le niveau en ascii
 */

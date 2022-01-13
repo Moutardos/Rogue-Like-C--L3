@@ -29,7 +29,8 @@ int treat_action(Floor*etage){
 				if(next_type == TREASURE){
 					etage->map[next_pos.y][next_pos.x].type = TREASUREO;
 					etage->nb_coffre-=1;
-					treasure_opening(pj, etage->map[next_pos.y][next_pos.y].entity.coffre.contenu);
+					Coffre chest = init_coffre(etage->number);
+					treasure_opening(pj, chest);
 					update_cell(etage, next_pos);
 				}
 				if (next_type == MONSTER){
@@ -99,13 +100,14 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 }
 
 
-int treasure_opening(Personnage* pj, Objet* loot){
+int treasure_opening(Personnage* pj, Coffre chest){
+	draw_chest(chest.contenu, chest.nb_objet);
+	hud(*pj);
 	Action action = control();
 	Cardinal direction;
-	Objet content[1];
 	while(action.typeaction != MENU){
 		direction = action.direction;
-		draw_chest(content);
+		draw_chest(chest.contenu, chest.nb_objet);
 		hud(*pj);
 		switch(action.typeaction){
 			case MOVE:
@@ -116,7 +118,7 @@ int treasure_opening(Personnage* pj, Objet* loot){
 
 		action = control();
 	}
-
+	
 }
 
 int* choose_stats_lvlup(Personnage* pj, int* stat){

@@ -405,9 +405,15 @@ void draw_inventory(Personnage pj){
 	MLV_resize_image(inv_content[11], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
 	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
 }
-void draw_chest(Objet content[]){
-	MLV_draw_image(MLV_load_image("art/sprite/item/chest.png"), WINDOWS_W / 6, WINDOWS_H / 5);
-	
+void draw_chest(Objet content[], int size){
+	MLV_Image* chest = MLV_load_image("art/sprite/item/chest.png");
+	MLV_resize_image(chest, WINDOWS_W / 2 , WINDOWS_W / 2 );
+	MLV_draw_image(chest, WINDOWS_W / 6, WINDOWS_H / 5);
+	int i;
+	for(i = 0; i < size; i++){
+		MLV_draw_image(inventory, WINDOWS_W / 2.7 + (WINDOWS_W - BORDER_GAME) / 3 * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
+		MLV_draw_image(MLV_load_image(image_url_object(content[i])), WINDOWS_W / 2.7 + (WINDOWS_W - BORDER_GAME) / 3 * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
+	}
 }
 char cell_into_char(Celltype cell_type){
 	switch(cell_type){

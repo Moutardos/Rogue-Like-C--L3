@@ -42,4 +42,7 @@ void print_weapon(Objet weapon);
 /* Renvoie une armure avec une qualité aléatoire */
 Objet generate_armor(int etage);
 void print_armor(Objet armor);
+
+/* Renvoie un objet généré aléatoirement */
+Objet generate_objet(int etage, TypeObjet type);
 #endif

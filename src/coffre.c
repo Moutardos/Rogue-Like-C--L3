@@ -4,9 +4,11 @@
 
 Coffre init_coffre(int etage){
 	Coffre new_coffre;
-	Objet obj =generate_weapon(etage);
-	new_coffre.contenu[0] = obj;
-	new_coffre.contenu[1] = obj;
+	int i = rand() % 3 + 1, j;
+	for(j = 0; j < i; j++) {
+		new_coffre.contenu[j] = generate_objet(etage, rand() % 4);
+	}
+	new_coffre.nb_objet = i;
 	new_coffre.opened = 0;
 	return new_coffre;
 }
