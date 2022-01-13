@@ -6,7 +6,7 @@ Objet generate_weapon(int etage){
 	int bonus;
 	sword.type = WEAPON;
 	sword.specificite.qualite = 1 + rand() % etage;
-	atk =  10 * sword.specificite.qualite;
+	atk =  5 * sword.specificite.qualite;
 	bonus = atk * rand_percent(0,20);
 	sword.bonus.Atk = atk + bonus;
 	return sword;
@@ -22,7 +22,7 @@ Objet generate_armor(int etage){
 	int bonus;
 	armor.type = ARMOR;
 	armor.specificite.qualite = 1 + rand() % etage;
-	def =  10 * armor.specificite.qualite;
+	def =  5 * armor.specificite.qualite;
 	bonus = def * rand_percent(0,20);
 	armor.bonus.Def = def + bonus;
 	return armor;
