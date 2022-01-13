@@ -164,7 +164,7 @@ int init_vision(Floor* etage){
 
 		}
 	}
-	hud(etage);
+	hud(etage->joueur);
 	MLV_actualise_window();
 	return 0; 
 }
@@ -300,7 +300,7 @@ int movement_vision(Floor* etage, Cardinal direction){
 
 
 	 
-	hud(etage);
+	hud(etage->joueur);
     MLV_actualise_window();
 
 	return 0;
@@ -326,12 +326,11 @@ void update_cell(Floor* etage, Position pos){
 
 }
 
-void hud(Floor* etage){
+void hud(Personnage pj){
 	char stat_txt[999];
 	Position start;
 	const int nb_line = 2;
 	const int marge = 3;
-	Personnage pj = etage->joueur;
 	Attribut stat_pj =  pj.stat;
 	int portrait_size = (WINDOWS_W - BORDER_GAME) * 1/3 +1;
 	MLV_draw_image( portrait,BORDER_GAME, 0);
@@ -349,17 +348,7 @@ void hud(Floor* etage){
 	MLV_draw_text_with_font(BORDER_GAME + 5, (WINDOWS_W - BORDER_GAME) / 3 * 4 + 5, "0", font, MLV_COLOR_WHITE);
 	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
 	MLV_draw_image(inventory, BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
-	/*test*/
-	pj.inventory[0] = generate_weapon(etage);
-	pj.inventory[1] = generate_weapon(etage);
-	pj.inventory[1].type = POTION;
-	pj.inventory[1].specificite.potion.type = PMAGIE;
-	pj.inventory[2] = generate_weapon(etage);
-	pj.inventory[2].type = WAND;
-	pj.inventory[3] = generate_weapon(etage);
-	pj.inventory[3].type = ARMOR;
-	pj.len_inventory = 4;
-	/*test*/
+	
 	draw_inventory(pj);
 	
 	MLV_actualise_window();
@@ -415,6 +404,10 @@ void draw_inventory(Personnage pj){
 	inv_content[11] = MLV_load_image(image_url_object(pj.gear[1]));
 	MLV_resize_image(inv_content[11], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
 	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+}
+void draw_chest(Objet content[]){
+	MLV_draw_image(MLV_load_image("art/sprite/item/chest.png"), WINDOWS_W / 6, WINDOWS_H / 5);
+	
 }
 char cell_into_char(Celltype cell_type){
 	switch(cell_type){
