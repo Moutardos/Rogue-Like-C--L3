@@ -38,4 +38,8 @@ typedef struct objet{
 /* Renvoie une arme avec une qualite aleatoire */
 Objet generate_weapon(int etage);
 void print_weapon(Objet weapon);
+
+/* Renvoie une armure avec une qualité aléatoire */
+Objet generate_armor(int etage);
+void print_armor(Objet armor);
 #endif

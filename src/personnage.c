@@ -9,7 +9,7 @@ Personnage creation_perso(Race race){
     pj.direction = NORTH;
     int i;
 	pj.gear[0] = generate_weapon(1); /* arme */
-	pj.gear[1] = generate_weapon(1); /* armure */
+	pj.gear[1] = generate_armor(1); /* armure */
     
     return pj;
 }

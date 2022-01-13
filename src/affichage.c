@@ -395,6 +395,14 @@ void draw_inventory(Personnage pj){
         MLV_resize_image(inv_content[i], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
         MLV_draw_image(inv_content[i], BORDER_GAME + (i%3)* (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * (i/3 + 1));
 	}
+	free(inv_content[10]);
+	inv_content[10] = MLV_load_image(image_url_object(pj.gear[0]));
+	MLV_resize_image(inv_content[10], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
+	MLV_draw_image(inv_content[10], BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+	free(inv_content[11]);
+	inv_content[11] = MLV_load_image(image_url_object(pj.gear[1]));
+	MLV_resize_image(inv_content[11], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
+	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
 }
 char cell_into_char(Celltype cell_type){
 	switch(cell_type){
