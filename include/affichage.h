@@ -24,7 +24,7 @@ int load_cell(Floor* etage, Position cellpos, MLV_Image** image);
 
 const char* image_url(Celltype cell_type, int theme);
 const char* image_url_monstre(TypeMonstre monstre);
-
+const char* image_url_object(Objet objet);
 
 int init_vision(Floor* etage);
 void free_graph();
@@ -52,6 +52,10 @@ void draw_char_bars(Personnage pj, int portrait_size);
 
 /* Affiche une barre a la position indique, affichant le pourcentage de completion */
 void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag);
+
+/* Affiche le contenu de l'inventaire du joueur aux emplacements adéquats */
+void draw_inventory(Personnage pj);
+
 /* FONCTION DEBUG, affiche le niveau en ascii
 */
 void affiche_floor_ascii(Floor* etage);

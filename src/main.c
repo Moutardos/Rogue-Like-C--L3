@@ -16,7 +16,6 @@ int main(int argc, char const *argv[]){
 	generate_floor(etage);
 	init_vision(etage);
 
-
 	while ( (action_done = treat_action(etage)) != -1){
 		if (action_done == 0)
 			continue;

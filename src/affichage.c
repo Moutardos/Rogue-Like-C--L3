@@ -7,6 +7,7 @@ static MLV_Image* image_perso;
 static MLV_Image* background;
 static MLV_Image* portrait;
 static MLV_Image* inventory;
+static MLV_Image* inv_content[12];
 static MLV_Image* off_limit;
 static MLV_Image*** vision_joueur;
 static MLV_Image* bars;
@@ -116,9 +117,28 @@ const char* image_url(Celltype cell_type, int theme){
 const char* image_url_monstre(TypeMonstre monstre){
 	switch(monstre){
 		case ALIEN: return "art/sprite/enemy/Etest.png";
+		default : return "art/map/notfound.png";
 
 	}
 }
+
+const char* image_url_object(Objet objet){
+	switch(objet.type){
+		case ARMOR:  return "art/sprite/item/armor.png";
+		case WAND: 	 return "art/sprite/item/wand.png";
+		case WEAPON: return "art/sprite/item/weapon.png";
+		case POTION:  
+			switch(objet.specificite.potion.type){
+				case PSOIN: 			return "art/sprite/item/redPotion.png";
+				case PMAGIE: 			return "art/sprite/item/bluePotion.png";
+				case PREGEN: 			return "art/sprite/item/pinkPotion.png";
+				case PPRECISION: 		return "art/sprite/item/yellowPotion.png";
+				case PAPPRENTISSAGE: 	return "art/sprite/item/dkbluePotion.png";
+			}
+		default : return "art/map/notfound.png";
+	}
+}
+
 int init_vision(Floor* etage){
 	/* remplie case +x autour du perso*/ 
 	Position pos_joueur = etage->joueur.pos;
@@ -327,6 +347,18 @@ void hud(Floor* etage){
 	MLV_draw_text_with_font(BORDER_GAME + 5, (WINDOWS_W - BORDER_GAME) / 3 * 4 + 5, "0", font, MLV_COLOR_WHITE);
 	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
 	MLV_draw_image(inventory, BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+	/*test*/
+	pj.inventory[0] = generate_weapon(etage);
+	pj.inventory[1] = generate_weapon(etage);
+	pj.inventory[1].type = POTION;
+	pj.inventory[1].specificite.potion.type = PMAGIE;
+	pj.inventory[2] = generate_weapon(etage);
+	pj.inventory[2].type = WAND;
+	pj.inventory[3] = generate_weapon(etage);
+	pj.inventory[3].type = ARMOR;
+	pj.len_inventory = 4;
+	/*test*/
+	draw_inventory(pj);
 	
 	MLV_actualise_window();
 }
@@ -354,6 +386,15 @@ void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y,
 	sprintf(stat_txt, "%s: %d/%d", tag, value, max_value);
 	MLV_draw_text_on_image(x, y + height/2, stat_txt, MLV_COLOR_WHITE, image);
 
+}
+void draw_inventory(Personnage pj){
+	int i, max = pj.len_inventory;
+	for(i = 0; i < max; i++) {
+		free(inv_content[i]);
+		inv_content[i] = MLV_load_image(image_url_object(pj.inventory[i]));
+        MLV_resize_image(inv_content[i], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
+        MLV_draw_image(inv_content[i], BORDER_GAME + (i%3)* (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * (i/3 + 1));
+	}
 }
 char cell_into_char(Celltype cell_type){
 	switch(cell_type){
