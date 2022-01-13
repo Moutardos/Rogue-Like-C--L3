@@ -406,7 +406,6 @@ void draw_inventory(Personnage pj){
 	MLV_resize_image(inv_content[11], INVENTORY_SLOT , INVENTORY_SLOT );
 	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * INVENTORY_SLOT, INVENTORY_SLOT * 4.2);
 
-	display_selected_item(pj.inventory[i], pj.selected_item);
 
 
 }

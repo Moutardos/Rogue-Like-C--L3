@@ -16,6 +16,8 @@ int main(int argc, char const *argv[]){
 		return 1;
 	
 	get_new_item(&pj, generate_objet(10, WEAPON));
+		get_new_item(&pj, generate_objet(10, WEAPON));
+
  	etage = init_floor(pj);
 
 	start_etage(etage);
@@ -24,7 +26,7 @@ int main(int argc, char const *argv[]){
 			continue;
 		affiche_floor_ascii(etage);
 		enemy_turn(etage); /* todo : enemy return la position du fight si besoin puis le fait */
-
+		hud(etage->joueur);
 	}
 	exit_game(etage);
 	return 0;

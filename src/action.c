@@ -66,6 +66,8 @@ int treat_action(Floor*etage){
 			if(pj->selected_item != -1){
 				discard_item(pj, pj->selected_item);
 				hud(*pj);
+				/* Permet juste d'enlever le visuel de l'objet discard */
+				display_selected_item(pj->gear[0], -1);
 			}
 
 			return 0;
