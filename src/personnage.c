@@ -3,14 +3,16 @@
 Personnage creation_perso(Race race){
     Personnage pj;
     pj.race = race;
+    pj.gear[0] = generate_weapon(1); /* arme */
+    pj.gear[1] = generate_armor(1); /* armure */
     pj.stat = init_PJ_attribut(race);
     pj.xp = 0;
     pj.level = 1;
     pj.direction = NORTH;
-    int i;
-	pj.gear[0] = generate_weapon(1); /* arme */
-	pj.gear[1] = generate_armor(1); /* armure */
+    pj.stat.Hp = get_max_hp(pj);
     pj.len_inventory = 0;
+    pj.len_potions = 0;
+    pj.selected_item =-1;
     return pj;
 }
 
@@ -21,6 +23,8 @@ void level_up(Personnage* pj, int* stat_lvlup){
     pj->stat.Atk += stat_lvlup[0];
     pj->stat.Int += stat_lvlup[1];
     pj->stat.Def += stat_lvlup[2];
+    pj->xp = 0;
+    pj->level++;
 }
 
 
@@ -29,7 +33,7 @@ int hit_enemy(Personnage pj,Monstre* monstre){
     Attribut stat_pj = pj.stat;
     int damage;
     float percent = rand_percent(80,120);
-    
+    int crit_chance = is_potion_active(pj,PPRECISION) ? 85 : 95;
     /* ARME PHYSIQUE */
     if (pj.gear[0].type == WEAPON)
         damage =  (int) ((stat_pj.Atk + pj.gear[0].bonus.Atk) * (float)percent);
@@ -43,9 +47,12 @@ int hit_enemy(Personnage pj,Monstre* monstre){
     }
 
     /* HIT */
-    if (roll > monstre->miss){
-        if(roll >= 95)
+    if (roll > monstre->miss || is_potion_active(pj, PPRECISION)){
+        /* Potion de precision donnne 10% de crit en plus et empeche le miss */
+        if(roll >= (crit_chance)){
+            printf("CRIT %d", crit_chance);
             damage = damage *3;
+        }
             
         monstre->hp -= damage;
     }
@@ -53,5 +60,45 @@ int hit_enemy(Personnage pj,Monstre* monstre){
     if(monstre->hp <= 0)
         return 1;
     return 0;
+
+}
+
+int is_potion_active(Personnage pj, TypePotion type){
+    unsigned int i;
+    for (i =0; i < pj.len_potions; i++){
+        if (pj.active_potions[i].type == type)
+            return 1;
+    }
+    return 0;
+}
+
+int get_max_hp(Personnage pj){
+    return (pj.stat.Def + pj.gear[1].bonus.Def) * 10;
+}
+
+int get_max_mp(Personnage pj){
+    if(pj.gear[0].type == WAND)
+        return (pj.stat.Int + pj.gear[0].bonus.Int ) * 10 - 50;
+    else
+        return (pj.stat.Int) *10 -50;
+}
+
+void select_item(Personnage* pj, int nb){
+    pj->selected_item = nb;
+}
+
+void get_new_item(Personnage* pj, Objet objet){
+    if (pj->len_inventory < 12){
+        pj->inventory[pj->len_inventory] = objet;
+        pj->len_inventory++;
+    }
+}
+
+void discard_item(Personnage* pj, int index){
+    unsigned i;
+    for(i = index; i < pj->len_inventory - 1; i++) 
+        pj->inventory[i] = pj->inventory[i + 1];
+    pj->len_inventory -= 1;
+    pj->selected_item = -1;
 
 }

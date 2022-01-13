@@ -6,6 +6,7 @@ Action control(){
 	Action action;
 	MLV_Keyboard_button key;
 	action.direction = NEUTRAL;	
+	action.choice = -1;
 	MLV_wait_keyboard(&key, NULL, NULL);
 	key_to_action(key, &action);
 	return action;
@@ -13,6 +14,7 @@ Action control(){
 }
 
 int treat_action(Floor*etage){
+	int end;
 	Action action = control();
 	Position player_pos = etage->joueur.pos;
 	Monstre* monstre;
@@ -26,32 +28,54 @@ int treat_action(Floor*etage){
 			if(is_traversable(next_type))
 				deplacer_joueur(etage, action, next_pos);
 			else{
-				if(next_type == TREASURE){
+				switch(next_type){
+					case TREASURE:
 					etage->map[next_pos.y][next_pos.x].type = TREASUREO;
 					etage->nb_coffre-=1;
 					Coffre chest = init_coffre(etage->number);
 					treasure_opening(pj, chest);
 					update_cell(etage, next_pos);
-				}
-				if (next_type == MONSTER){
-					monstre = &(etage->map[next_pos.y][next_pos.x].entity.monstre);
-					switch(hit_enemy(etage->joueur, monstre)){
-						case -1: return 0;
-						case 1: 
-							etage->map[next_pos.y][next_pos.x].type = ROOM;
-							update_cell(etage, next_pos);
+					break;
+					case MONSTER:
+						monstre = &(etage->map[next_pos.y][next_pos.x].entity.monstre);
+						switch(hit_enemy(etage->joueur, monstre)){
+							case -1: return 0;
+							case 1: 
+								etage->map[next_pos.y][next_pos.x].type = ROOM;
+								update_cell(etage, next_pos);
+						}
+						draw_bar_on_ennemy(etage, next_pos, *monstre);
+						break;
+					case STAIR_DOWN:
+						start_etage(etage);
+						return 0;
+					default:
+						break;
 					}
-					draw_bar_on_ennemy(etage, next_pos, *monstre);
-				}
+
 			}
 			return 1;
 		case USE :
-			switch(position_type(etage, player_pos)){
-				default: return 0;
+			if(pj->selected_item != -1){
+				printf("%d inv\n",pj->selected_item);
+				return use_item(pj, pj->selected_item);
 			}
+
+			return 0;
+		case DISCARD:
+			if(pj->selected_item != -1){
+				discard_item(pj, pj->selected_item);
+				hud(*pj);
+			}
+
+			return 0;
 		case MENU :
 			return -1;
 		case ITEM :
+			if(action.choice != -1 && action.choice < pj->len_inventory){
+				select_item(pj, action.choice);
+				display_selected_item(pj->inventory[action.choice], action.choice);
+			}
 			return 0;
 		default : return 0;
 			/* todo */
@@ -60,6 +84,32 @@ int treat_action(Floor*etage){
 
 	return 0;
 
+}
+
+int use_item(Personnage* pj, int i){
+	Objet* item = &(pj->inventory[i]);
+	Objet* gear;
+	Objet temp;
+	switch(item->type){
+		case WEAPON:
+		case WAND:
+			gear = &(pj->gear[0]);
+			temp = *item;
+			*item = *gear;
+			*gear = temp;
+			display_selected_item(*item,i);
+			return 1;
+		case ARMOR:
+			gear = &(pj->gear[1]);
+			temp = *item;
+			*item = *gear;
+			*gear = temp;
+			display_selected_item(*item,i);
+			return 1;
+		case POTION:
+			return 0;
+
+	}
 }
 
 void key_to_action(MLV_Keyboard_button key, Action* action){
@@ -79,12 +129,20 @@ void key_to_action(MLV_Keyboard_button key, Action* action){
 		case MLV_KEYBOARD_RETURN:
 			action->typeaction = USE;
 			break;
+		case MLV_KEYBOARD_x:
+			action->typeaction = DISCARD;
+			break;
 		default:
 			if(key >= MLV_KEYBOARD_0 && key <=  MLV_KEYBOARD_9){
 				action->typeaction = ITEM;
+				action->choice = ((key - MLV_KEYBOARD_0))-1;
+				/* 1 doit etre le premier et 0 le dernier */
+				if(action->choice == -1)
+					action->choice = 9;
+				printf("%d choice\n", action->choice);
+				break;
 			}
 			action->typeaction = IDLE;
-				/* todo ajouter item tudu */
 
 	}
 }
@@ -102,13 +160,10 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 
 int treasure_opening(Personnage* pj, Coffre chest){
 	draw_chest(chest.contenu, chest.nb_objet);
-	hud(*pj);
 	Action action = control();
 	Cardinal direction;
 	while(action.typeaction != MENU){
 		direction = action.direction;
-		draw_chest(chest.contenu, chest.nb_objet);
-		hud(*pj);
 		switch(action.typeaction){
 			case MOVE:
 				break;
@@ -185,4 +240,10 @@ void deplacer_joueur(Floor* etage, Action action, Position new_pos){
 void exit_game(Floor* etage){
 	free_graph();
 	free_floor(etage);
+}
+
+void start_etage(Floor* etage){
+		generate_floor(etage);
+		init_vision(etage);
+
 }

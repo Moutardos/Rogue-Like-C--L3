@@ -7,13 +7,14 @@
 
 /* Move vers un ennemie -> Combat */
 typedef enum typeaction{
-	MOVE, USE, ITEM, MENU, IDLE
+	MOVE, USE, ITEM, MENU, IDLE, DISCARD
 }Typeaction;
 
 
 typedef struct action{
 	Cardinal direction;
 	Typeaction typeaction;
+	int choice;
 }Action; 
 
 Action control();
@@ -41,6 +42,8 @@ int treasure_opening(Personnage* pj, Coffre chest);
 /* Libere les donnes alloue avant de quitter le jeu */ 
 void exit_game(Floor* etage);
 
+/* Genere et affiche un nouveau terrain */
+void start_etage(Floor* etage);
 /* Permet au joueur de choisir visuelement quelles stats augmenter */
 int* choose_stats_lvlup(Personnage* pj, int* stat);
 #endif

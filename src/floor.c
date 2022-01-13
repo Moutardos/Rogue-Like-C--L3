@@ -5,19 +5,12 @@
 #include "affichage.h"
 
 Floor* init_floor(Personnage pj){
-	unsigned int i, j;
 	Floor* etage = malloc(sizeof(Floor));
 	
 	if (NULL == etage)
 		return NULL;
 
-	for (j = 0; j < FLOORH; ++j)
-		for (i = 0; i < FLOORW; ++i){
-			if (i == FLOORW/2 && j == FLOORH/2)
-				etage->map[j][i].type = STAIR_UP;
-			else
-				etage->map[j][i].type = WALL;
-		}
+
 
 	etage->joueur = pj;
 	etage->number = 0;
@@ -40,8 +33,15 @@ int generate_floor(Floor* etage){
 	int len_expand = 0;
 	int  len_voisines;
 	int pos;
-	unsigned int i;
+	unsigned int i, j;
 	srand(time(NULL));
+	for (j = 0; j < FLOORH; ++j)
+		for (i = 0; i < FLOORW; ++i){
+			if (i == FLOORW/2 && j == FLOORH/2)
+				etage->map[j][i].type = STAIR_UP;
+			else
+				etage->map[j][i].type = WALL;
+		}
 
 	etage->number +=1;
 

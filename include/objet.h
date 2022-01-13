@@ -30,7 +30,6 @@ typedef struct objet{
 	Specificite specificite;
 	Attribut bonus;
 	int cooldown;
-	int active;
 }Objet;
 
 

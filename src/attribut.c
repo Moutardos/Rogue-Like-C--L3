@@ -13,18 +13,11 @@ Attribut init_PJ_attribut(Race race){
 			stat_PJ.Def = 25;
 			break;
 	}
-	stat_PJ.Hp = get_max_hp(stat_PJ); 			 
-	stat_PJ.Mp = get_max_mp(stat_PJ);
+	stat_PJ.Hp = get_max_hp(stat_PJ, 0); 			 
+	stat_PJ.Mp = get_max_mp(stat_PJ, 0);
 	return stat_PJ;
 }
 
-int get_max_hp(Attribut stat){
-	return stat.Def * 10;
-}
-
-int get_max_mp(Attribut stat){
-	return stat.Int * 10 - 50;
-}
 
 float rand_percent(int i, int j){
 	int pourcentage = rand() % (j + 1);

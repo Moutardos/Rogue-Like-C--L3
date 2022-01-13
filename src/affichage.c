@@ -4,7 +4,6 @@
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 static MLV_Image* image_perso;
-static MLV_Image* background;
 static MLV_Image* portrait;
 static MLV_Image* inventory;
 static MLV_Image* inv_content[12];
@@ -12,6 +11,8 @@ static MLV_Image* off_limit;
 static MLV_Image*** vision_joueur;
 static MLV_Image* bars;
 static MLV_Image* ennemy_hp;
+static MLV_Image* obj_selected;
+static MLV_Font* font;
 
 int init_mlv(){
 		unsigned int i = 0;
@@ -22,23 +23,25 @@ int init_mlv(){
         
         off_limit = MLV_load_image("art/map/offlimit.png");
         
-        background = MLV_load_image("art/hud/bg.png");
-        MLV_draw_image(background,0,0);
-        
         portrait = MLV_load_image("art/hud/portrait.png");
         MLV_resize_image(off_limit, CELLSIZE , CELLSIZE );
         
         inventory = MLV_load_image("art/hud/inventory.png");
-        MLV_resize_image(inventory, (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
+        MLV_resize_image(inventory, INVENTORY_SLOT , INVENTORY_SLOT );
         
+        font = MLV_load_font( "art/fonts/arial.ttf" , 20 );
+
         vision_joueur =  malloc(sizeof(MLV_Image**) * (RANGE *2));
         if( vision_joueur == NULL){
         	free(vision_joueur);
         	return 0;
         }
         	
+        /* Permet de free les images facilement pour l'actualisation */ 
 		bars = MLV_create_image(0,0);
 		ennemy_hp = MLV_create_image(0,0);
+		obj_selected= MLV_create_image(0,0);
+
         for(i = 0; i < RANGE*2; i++){
 			vision_joueur[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
 			if (vision_joueur[i] == NULL){
@@ -300,7 +303,6 @@ int movement_vision(Floor* etage, Cardinal direction){
 
 
 	 
-	hud(etage->joueur);
     MLV_actualise_window();
 
 	return 0;
@@ -338,17 +340,16 @@ void hud(Personnage pj){
 	
 	/* On affiche le visuel du sac à dos et de l'arme/armure équipées */
 	int i, j;
-	MLV_Font* font = MLV_load_font( "art/fonts/arial.ttf" , 20 );
 	for(i = 0; i < 3; i++)
 		for(j = 0; j < 3; j++) {
-			MLV_draw_image(inventory, BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1));
-			MLV_draw_text_with_font(BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3 + 5, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1) + 5, "%d", font, MLV_COLOR_WHITE, i*3 + j + 1);
+			MLV_draw_image(inventory, BORDER_GAME + j* INVENTORY_SLOT, INVENTORY_SLOT * (i + 1));
+			MLV_draw_text_with_font(BORDER_GAME + j* INVENTORY_SLOT + 5, INVENTORY_SLOT * (i + 1) + 5, "%d", font, MLV_COLOR_WHITE, i*3 + j + 1);
 		}
-	MLV_draw_image(inventory, BORDER_GAME, (WINDOWS_W - BORDER_GAME) / 3 * 4);
-	MLV_draw_text_with_font(BORDER_GAME + 5, (WINDOWS_W - BORDER_GAME) / 3 * 4 + 5, "0", font, MLV_COLOR_WHITE);
-	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
-	MLV_draw_image(inventory, BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
-	
+	MLV_draw_image(inventory, BORDER_GAME, INVENTORY_SLOT * 4);
+	MLV_draw_text_with_font(BORDER_GAME + 5, INVENTORY_SLOT * 4 + 5, "0", font, MLV_COLOR_WHITE);
+	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, INVENTORY_SLOT * 4.2);
+	MLV_draw_image(inventory, BORDER_GAME + 2 * INVENTORY_SLOT, INVENTORY_SLOT * 4.2);
+
 	draw_inventory(pj);
 	
 	MLV_actualise_window();
@@ -363,8 +364,8 @@ void draw_char_bars(Personnage pj, int portrait_size){
 	MLV_free_image(bars);
 	bars = MLV_create_image(max_bar, bar_h*3);
 
-	draw_bar_on_image(bars, stat_pj.Hp, get_max_hp(stat_pj), 0, 0, bar_h, max_bar, MLV_rgba(118,205,68, 255), "HP");
-	draw_bar_on_image(bars, stat_pj.Mp, get_max_mp(stat_pj), 0, bar_h, bar_h, max_bar, MLV_rgba(118,205,217, 255), "MP");
+	draw_bar_on_image(bars, stat_pj.Hp, get_max_hp(pj), 0, 0, bar_h, max_bar, MLV_rgba(118,205,68, 255), "HP");
+	draw_bar_on_image(bars, stat_pj.Mp, get_max_mp(pj), 0, bar_h, bar_h, max_bar, MLV_rgba(118,205,217, 255), "MP");
 	draw_bar_on_image(bars, pj.xp, xp_to_levelup(pj.level + 1), 0, bar_h*2, bar_h, max_bar,  MLV_rgba(92,51,217, 255), "XP");
 	MLV_draw_image(bars, start_x, 0);
 }
@@ -393,17 +394,53 @@ void draw_inventory(Personnage pj){
 	for(i = 0; i < max; i++) {
 		free(inv_content[i]);
 		inv_content[i] = MLV_load_image(image_url_object(pj.inventory[i]));
-        MLV_resize_image(inv_content[i], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
-        MLV_draw_image(inv_content[i], BORDER_GAME + (i%3)* (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * (i/3 + 1));
+        MLV_resize_image(inv_content[i], INVENTORY_SLOT , INVENTORY_SLOT );
+        MLV_draw_image(inv_content[i], BORDER_GAME + (i%3)* INVENTORY_SLOT, INVENTORY_SLOT * (i/3 + 1));
 	}
 	free(inv_content[10]);
 	inv_content[10] = MLV_load_image(image_url_object(pj.gear[0]));
-	MLV_resize_image(inv_content[10], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
-	MLV_draw_image(inv_content[10], BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+	MLV_resize_image(inv_content[10], INVENTORY_SLOT , INVENTORY_SLOT );
+	MLV_draw_image(inv_content[10], BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, INVENTORY_SLOT * 4.2);
 	free(inv_content[11]);
 	inv_content[11] = MLV_load_image(image_url_object(pj.gear[1]));
-	MLV_resize_image(inv_content[11], (WINDOWS_W - BORDER_GAME) / 3 , (WINDOWS_W - BORDER_GAME) / 3 );
-	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
+	MLV_resize_image(inv_content[11], INVENTORY_SLOT , INVENTORY_SLOT );
+	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * INVENTORY_SLOT, INVENTORY_SLOT * 4.2);
+
+	display_selected_item(pj.inventory[i], pj.selected_item);
+
+
+}
+
+void display_selected_item(Objet objet,int slot){
+	char description[999];
+	const char* info = "Space/Enter = use/equip\nX = Discard";
+	MLV_free_image(obj_selected);
+	obj_selected = MLV_create_image(WINDOWS_W - BORDER_GAME, INVENTORY_SLOT);
+	if(slot != -1){
+		MLV_draw_image_on_image(MLV_load_image(image_url_object(objet)),obj_selected, 0,0);
+		switch(objet.type){
+			case WEAPON:
+				sprintf(description, "ATK : %d", objet.bonus.Atk);
+				break;
+			case WAND:
+				sprintf(description, "INT : %d", objet.bonus.Int);
+				break;
+			case ARMOR:
+				sprintf(description, "DEF : %d", objet.bonus.Def);
+				break;
+			case POTION:
+				sprintf(description, "Potion ??");
+				break;
+			default:
+				break;
+
+		}
+		MLV_draw_text_with_font_on_image(5, 5, "%d", font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 20, info, font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 0, description, font, MLV_COLOR_WHITE, obj_selected);
+	}
+	MLV_draw_image(obj_selected, BORDER_GAME, BORDER_GAME - INVENTORY_SLOT);
+	MLV_actualise_window();
 }
 void draw_chest(Objet content[], int size){
 	MLV_Image* chest = MLV_load_image("art/sprite/item/chest.png");
@@ -411,9 +448,10 @@ void draw_chest(Objet content[], int size){
 	MLV_draw_image(chest, WINDOWS_W / 6, WINDOWS_H / 5);
 	int i;
 	for(i = 0; i < size; i++){
-		MLV_draw_image(inventory, WINDOWS_W / 2.7 + (WINDOWS_W - BORDER_GAME) / 3 * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
-		MLV_draw_image(MLV_load_image(image_url_object(content[i])), WINDOWS_W / 2.7 + (WINDOWS_W - BORDER_GAME) / 3 * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
+		MLV_draw_image(inventory, WINDOWS_W / 2.7 + INVENTORY_SLOT * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
+		MLV_draw_image(MLV_load_image(image_url_object(content[i])), WINDOWS_W / 2.7 + INVENTORY_SLOT * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
 	}
+	MLV_actualise_window();
 }
 char cell_into_char(Celltype cell_type){
 	switch(cell_type){

@@ -11,6 +11,7 @@
 #define CELLSIZE 132/* Taille d'une cell en pixel (normalement 32) */
 #define RANGE 7
 
+#define INVENTORY_SLOT (WINDOWS_W - BORDER_GAME) / 3
 #define BORDER_GAME CELLSIZE * RANGE
 
 

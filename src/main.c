@@ -6,22 +6,24 @@
 int main(int argc, char const *argv[]){
 	Action action;
 	Personnage pj = creation_perso(HUMAN);
-	Floor* etage = init_floor(pj);
+	Floor* etage;
+
 	int action_done;
 	if (!test())
 		return 1;
 
 	if (!init_mlv())
 		return 1;
-	generate_floor(etage);
-	init_vision(etage);
+	
+	get_new_item(&pj, generate_objet(10, WEAPON));
+ 	etage = init_floor(pj);
 
+	start_etage(etage);
 	while ( (action_done = treat_action(etage)) != -1){
 		if (action_done == 0)
 			continue;
 		affiche_floor_ascii(etage);
 		enemy_turn(etage); /* todo : enemy return la position du fight si besoin puis le fait */
-		hud(etage->joueur);
 
 	}
 	exit_game(etage);
