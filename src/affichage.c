@@ -321,10 +321,10 @@ void hud(Floor* etage){
 	for(i = 0; i < 3; i++)
 		for(j = 0; j < 3; j++) {
 			MLV_draw_image(inventory, BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1));
-			MLV_draw_text_with_font(BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3 + 5, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1) + 5, "%d", font, MLV_COLOR_WHITE, i*3 + j);
+			MLV_draw_text_with_font(BORDER_GAME + j* (WINDOWS_W - BORDER_GAME) / 3 + 5, (WINDOWS_W - BORDER_GAME) / 3 * (i + 1) + 5, "%d", font, MLV_COLOR_WHITE, i*3 + j + 1);
 		}
 	MLV_draw_image(inventory, BORDER_GAME, (WINDOWS_W - BORDER_GAME) / 3 * 4);
-	MLV_draw_text_with_font(BORDER_GAME + 5, (WINDOWS_W - BORDER_GAME) / 3 * 4 + 5, "9", font, MLV_COLOR_WHITE);
+	MLV_draw_text_with_font(BORDER_GAME + 5, (WINDOWS_W - BORDER_GAME) / 3 * 4 + 5, "0", font, MLV_COLOR_WHITE);
 	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
 	MLV_draw_image(inventory, BORDER_GAME + 2 * (WINDOWS_W - BORDER_GAME) / 3, (WINDOWS_W - BORDER_GAME) / 3 * 4.2);
 	
