@@ -21,7 +21,7 @@ int main(int argc, char const *argv[]){
 			continue;
 		affiche_floor_ascii(etage);
 		enemy_turn(etage); /* todo : enemy return la position du fight si besoin puis le fait */
-		hud(etage);
+		hud(etage->joueur);
 
 	}
 	exit_game(etage);

@@ -42,7 +42,7 @@ void rotate_pj(Floor* etage);
 /* Recoie une position dans l'etage et renvoie la position selon la vision du joueur */
 Position absolute_pos_to_vision_pos(Floor* etage, Position pos);
 /* Affiche l'HUD contenant les stats du perso */
-void hud(Floor* etage);
+void hud(Personnage pj);
 
 /* Load et draw la cell de la case pos_abs dans l'etage en i j */
 void display_cell(Floor* etage, Position pos_abs, int i, int j);
@@ -55,6 +55,9 @@ void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y,
 
 /* Affiche le contenu de l'inventaire du joueur aux emplacements adéquats */
 void draw_inventory(Personnage pj);
+
+/* Affiche un coffre ouvert et son contenu */
+void draw_chest(Objet content[]);
 
 /* FONCTION DEBUG, affiche le niveau en ascii
 */

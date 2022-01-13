@@ -96,8 +96,11 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 int treasure_opening(Personnage* pj, Objet* loot){
 	Action action = control();
 	Cardinal direction;
+	Objet content[1];
 	while(action.typeaction != MENU){
 		direction = action.direction;
+		draw_chest(content);
+		hud(*pj);
 		switch(action.typeaction){
 			case MOVE:
 				break;
