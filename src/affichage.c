@@ -406,13 +406,12 @@ void draw_inventory(Personnage pj){
 	MLV_resize_image(inv_content[11], INVENTORY_SLOT , INVENTORY_SLOT );
 	MLV_draw_image(inv_content[11], BORDER_GAME + 2 * INVENTORY_SLOT, INVENTORY_SLOT * 4.2);
 
-
-
 }
 
 void display_selected_item(Objet objet,int slot){
 	char description[999];
-	const char* info = "Space/Enter = use/equip\nX = Discard";
+	const char* info1 = "Space/Enter = use/equip";
+	const char* info2 = "X = Discard";
 	MLV_free_image(obj_selected);
 	obj_selected = MLV_create_image(WINDOWS_W - BORDER_GAME, INVENTORY_SLOT);
 	if(slot != -1){
@@ -435,7 +434,8 @@ void display_selected_item(Objet objet,int slot){
 
 		}
 		MLV_draw_text_with_font_on_image(5, 5, "%d", font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
-		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 20, info, font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 20, info1, font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 20 * 2, info2, font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
 		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 0, description, font, MLV_COLOR_WHITE, obj_selected);
 	}
 	MLV_draw_image(obj_selected, BORDER_GAME, BORDER_GAME - INVENTORY_SLOT);

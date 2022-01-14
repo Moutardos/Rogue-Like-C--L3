@@ -13,3 +13,11 @@ Coffre init_coffre(int etage){
 	return new_coffre;
 }
 
+void remove_item(Coffre chest, int pos){
+	if(pos > -1 && pos < chest.nb_objet){
+		int i;
+		for(i = pos + 1; i < chest.nb_objet; i++)
+			chest.contenu[i - 1] = chest.contenu[i];
+		chest.nb_objet--;
+	}
+}

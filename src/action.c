@@ -31,9 +31,8 @@ int treat_action(Floor*etage){
 				switch(next_type){
 					case TREASURE:
 					etage->map[next_pos.y][next_pos.x].type = TREASUREO;
-					etage->nb_coffre-=1;
-					Coffre chest = init_coffre(etage->number);
-					treasure_opening(pj, chest);
+					etage->nb_coffre-=1; 
+					treasure_opening(pj, init_coffre(etage->number));
 					update_cell(etage, next_pos);
 					break;
 					case MONSTER:
@@ -162,17 +161,63 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 
 int treasure_opening(Personnage* pj, Coffre chest){
 	draw_chest(chest.contenu, chest.nb_objet);
+	hud(*pj);
 	Action action = control();
 	Cardinal direction;
+	int selec = -1;
 	while(action.typeaction != MENU){
 		direction = action.direction;
 		switch(action.typeaction){
 			case MOVE:
+				switch(direction){
+					case WEST:	
+						if(selec > 0 && selec < chest.nb_objet)
+							selec -= 1;
+						else
+							selec = 0;
+						break;
+					case EAST:	
+						if(selec > -1 && selec < chest.nb_objet - 1)
+							selec += 1;
+						else
+							selec = chest.nb_objet - 1;
+						break;
+				}
+				select_item(pj, -1);
 				break;
+			
+			case ITEM:
+				if(action.choice != -1 && action.choice < pj->len_inventory){
+					select_item(pj, action.choice);
+					selec = pj->selected_item + chest.nb_objet;
+				}
+				break;
+			
 			case USE:
+				if(selec > -1 && selec < chest.nb_objet) {
+					get_new_item(pj, chest.contenu[selec]);
+					int i;
+					for(i = selec + 1; i < chest.nb_objet; i++)
+						chest.contenu[i - 1] = chest.contenu[i];
+					chest.nb_objet--;
+				}
+				else if(selec >= chest.nb_objet && selec < pj->len_inventory + chest.nb_objet)
+					use_item(pj, selec - chest.nb_objet);
+				break;
+			
+			case DISCARD:
+				if(pj->selected_item > -1)
+					discard_item(pj, pj->selected_item);
 				break;
 		}
-
+		
+		if(selec > -1 && selec < chest.nb_objet)
+			display_selected_item(chest.contenu[selec], selec - chest.nb_objet - 1);
+		else if(selec >= chest.nb_objet && selec < pj->len_inventory + chest.nb_objet)
+			display_selected_item(pj->inventory[pj->selected_item], pj->selected_item);
+		
+		draw_chest(chest.contenu, chest.nb_objet);
+		hud(*pj);
 		action = control();
 	}
 	

@@ -88,7 +88,7 @@ void select_item(Personnage* pj, int nb){
 }
 
 void get_new_item(Personnage* pj, Objet objet){
-    if (pj->len_inventory < 12){
+    if (pj->len_inventory < 10){
         pj->inventory[pj->len_inventory] = objet;
         pj->len_inventory++;
     }

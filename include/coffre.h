@@ -9,5 +9,6 @@ typedef struct coffre{
 }Coffre;
 
 Coffre init_coffre(int etage);
+void remove_item(Coffre chest, int pos);
 
 #endif
