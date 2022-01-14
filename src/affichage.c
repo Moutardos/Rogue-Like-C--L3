@@ -1,7 +1,6 @@
 #include "affichage.h"
 #include "attribut.h"
 #include <stdio.h>
-#define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
 static MLV_Image* image_perso;
 static MLV_Image* portrait;
@@ -14,7 +13,7 @@ static MLV_Image* ennemy_hp;
 static MLV_Image* obj_selected;
 static MLV_Image* stat_screen;
 int init_mlv(){
-		unsigned int i = 0;
+		int i = 0;
         
         MLV_create_window( "Rendu final!", "roguelike", WINDOWS_W, WINDOWS_H );
         image_perso = MLV_load_image("art/sprite/char/mc.png");
@@ -48,14 +47,10 @@ int init_mlv(){
 				return 0;
 			}
         }
-
         return 1;
-
-;
 }
 
 void free_graph(){
-	int i = 0;
 	MLV_clear_window(MLV_COLOR_WHITE);
 	MLV_free_window();
 	if (vision_joueur != NULL){
@@ -330,17 +325,12 @@ void update_cell(Floor* etage, Position pos){
 }
 
 void hud(Personnage pj){
-	char stat_txt[999];
-	Position start;
-	const int nb_line = 2;
-	const int marge = 3;
-	Attribut stat_pj =  pj.stat;
 	int portrait_size = (WINDOWS_W - BORDER_GAME) * 1/3 +1;
+	int i, j;
 	MLV_draw_image( portrait,BORDER_GAME, 0);
 	draw_char_bars(pj, portrait_size);
 	
 	/* On affiche le visuel du sac à dos et de l'arme/armure équipées */
-	int i, j;
 	for(i = 0; i < 3; i++)
 		for(j = 0; j < 3; j++) {
 			MLV_draw_image(inventory, BORDER_GAME + j* INVENTORY_SLOT, INVENTORY_SLOT * (i + 1));
@@ -384,7 +374,6 @@ void display_stat(Personnage pj, int* stat_lvlup, int curseur){
 }
 void draw_char_bars(Personnage pj, int portrait_size){
 	Attribut stat_pj =  pj.stat;
-	float xp_percent = pj.xp / xp_to_levelup(pj.level+1);
 	int start_x = BORDER_GAME + portrait_size;
 	int max_bar = portrait_size*2;
 	int bar_h = portrait_size/3;
@@ -470,9 +459,11 @@ void display_selected_item(Objet objet,int slot){
 }
 void draw_chest(Objet content[], int size){
 	MLV_Image* chest = MLV_load_image("art/sprite/item/chest.png");
+	int i;
+
 	MLV_resize_image(chest, WINDOWS_W / 2 , WINDOWS_W / 2 );
 	MLV_draw_image(chest, WINDOWS_W / 6, WINDOWS_H / 5);
-	int i;
+	
 	for(i = 0; i < size; i++){
 		MLV_draw_image(inventory, WINDOWS_W / 2.7 + INVENTORY_SLOT * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
 		MLV_draw_image(MLV_load_image(image_url_object(content[i])), WINDOWS_W / 2.7 + INVENTORY_SLOT * (i+0.5 - size/2.0), WINDOWS_H / 2.5);
@@ -487,7 +478,7 @@ char cell_into_char(Celltype cell_type){
 		case TREASURE: return '?';
 		case STAIR_UP: return '>';
 		case STAIR_DOWN: return '<';
-		case TREASUREO: 't';
+		case TREASUREO: return 't';
 		default : return 'Z'; /* jamais censee etre affiche */
 
 	}

@@ -1,4 +1,5 @@
 #include "personnage.h"
+#include <stdlib.h>
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 Personnage creation_perso(Race race){
@@ -11,6 +12,7 @@ Personnage creation_perso(Race race){
     pj.level = 1;
     pj.direction = NORTH;
     pj.stat.Hp = get_max_hp(pj);
+    pj.stat.Mp = get_max_mp(pj);
     pj.len_inventory = 0;
     pj.len_potions = 0;
     pj.selected_item =-1;
@@ -55,7 +57,6 @@ int hit_enemy(Personnage* pj,Monstre* monstre){
     /* WAND */
     else if (pj->gear[0].type == WAND){
         if(stat_pj.Mp >= 20){
-            printf("MAGIE");
             pj->stat.Mp -= 20;
             damage = (int) ((stat_pj.Int + pj->gear[0].bonus.Int) * 2);
         }
@@ -67,7 +68,6 @@ int hit_enemy(Personnage* pj,Monstre* monstre){
     if (roll > monstre->miss || is_potion_active(*pj, PPRECISION)){
         /* Potion de precision donnne 10% de crit en plus et empeche le miss */
         if(roll >= (crit_chance)){
-            printf("CRIT %d", crit_chance);
             damage = damage *3;
         }
             
@@ -106,7 +106,7 @@ void potion_effects(Personnage* pj){
             pj->len_potions--;
             i--;
         }
-        else if (pj->active_potions[i].type = PREGEN){
+        else if (pj->active_potions[i].type == PREGEN){
             pj->stat.Hp = MIN(pj->stat.Hp + 20, get_max_hp(*pj));
             pj->stat.Mp = MIN(pj->stat.Mp + 10, get_max_mp(*pj));
 

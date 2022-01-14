@@ -14,9 +14,7 @@ Action control(){
 }
 
 int treat_action(Floor*etage){
-	int end;
 	Action action = control();
-	Position player_pos = etage->joueur.pos;
 	Monstre* monstre;
 	Personnage* pj = &etage->joueur;
 	Position next_pos = next_position(etage, action);
@@ -116,10 +114,10 @@ int use_item(Personnage* pj, int i){
 			return 0;
 
 	}
+	return 0;
 }
 
 void key_to_action(MLV_Keyboard_button key, Action* action){
-	int nb;
 	switch(key){
 		case  MLV_KEYBOARD_DOWN:  
 		case  MLV_KEYBOARD_UP:    
@@ -163,11 +161,13 @@ Cardinal key_to_cardinal(MLV_Keyboard_button key){
 }
 
 
-int treasure_opening(Personnage* pj, Coffre chest){
-	draw_chest(chest.contenu, chest.nb_objet);
-	Action action = control();
+void treasure_opening(Personnage* pj, Coffre chest){
+	Action action; 
 	Cardinal direction;
+	int i;
 	int selec = -1;
+	draw_chest(chest.contenu, chest.nb_objet);
+	action = control();
 	while(action.typeaction != MENU){
 		direction = action.direction;
 		switch(action.typeaction){
@@ -185,6 +185,8 @@ int treasure_opening(Personnage* pj, Coffre chest){
 						else
 							selec = chest.nb_objet - 1;
 						break;
+					default:
+						break;
 				}
 				select_item(pj, -1);
 				break;
@@ -199,7 +201,6 @@ int treasure_opening(Personnage* pj, Coffre chest){
 			case USE:
 				if(selec > -1 && selec < chest.nb_objet) {
 					get_new_item(pj, chest.contenu[selec]);
-					int i;
 					for(i = selec + 1; i < chest.nb_objet; i++)
 						chest.contenu[i - 1] = chest.contenu[i];
 					chest.nb_objet--;
@@ -211,6 +212,8 @@ int treasure_opening(Personnage* pj, Coffre chest){
 			case DISCARD:
 				if(pj->selected_item > -1)
 					discard_item(pj, pj->selected_item);
+				break;
+			default:
 				break;
 		}
 		
@@ -258,7 +261,10 @@ void choose_stats_lvlup(Personnage* pj){
 					if (index < 2)
 						index++;
 					break;
-				}
+				
+				default:
+				break;
+			}
 		}
 		display_stat(*pj, stat, index);
 		action = control();
@@ -313,6 +319,8 @@ int continue_menu(Floor* etage){
 					index = 0;
 				else if (direction == SOUTH)
 					index = 1;
+			default:
+				break;
 		}
 		refresh_vision(etage);			
 		display_continue(index);

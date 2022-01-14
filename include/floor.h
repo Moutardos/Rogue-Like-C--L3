@@ -28,8 +28,8 @@ void free_floor(Floor* etage);
 */
 int generate_floor(Floor* etage);
 
-/* Genere les elements de l'etage supplementaire (Tresors et monstres), renvoie la liste de monstre*/
-Position* generate_elem(Floor* etage);
+/* Genere les elements de l'etage supplementaire (Tresors et monstres)*/
+void generate_elem(Floor* etage);
 
 /* Fait apparaitre le personnage principal dans une case a cote de l'escalier
 */
@@ -38,6 +38,8 @@ void spawn_perso(Floor * etage);
 /* Fait apparaitre un element du type indique dans la position */
 void spawn_elem(Floor* etage, Celltype type, Position pos);
 
+/* Verifie si le joueur est a cote de monstre, si oui, rend le monstre aggresif*/
+void enemy_turn(Floor* etage);
 /* Fonction generation de floor : renvoie 1 si la case mur en position celpos est admissible
 */
 int is_eligible(Floor* etage, Position cellpos);

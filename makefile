@@ -5,7 +5,7 @@ CFLAGS = -Wall -pedantic -ansi
 CPPFLAGS = -Iinclude 
 LDLIBS = -lMLV
 SRCDIR := src
-OBJDIR := obj
+OBJDIR := bin
 BINDIR := .
 
 EXE := $(TARGET)

@@ -58,6 +58,8 @@ void get_new_item(Personnage* pj, Objet objet);
 /* Bois la potion et la rend active */
 void drink_potion(Personnage* pj, Potion potion, int index);
 
+/* Parcours les potions actives et proc leurs effets */
+void potion_effects(Personnage* pj);
 /* Supprime de l'inventaire l'objet a la position index */
 void discard_item(Personnage* pj, int index);
 #endif

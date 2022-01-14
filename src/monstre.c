@@ -1,5 +1,5 @@
 #include <monstre.h>
-
+#include <stdlib.h>
 Monstre init_monstre(TypeMonstre type, int dif){
 	Monstre new_monstre;
 	new_monstre.type = type;

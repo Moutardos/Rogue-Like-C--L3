@@ -1,5 +1,6 @@
 #include "objet.h"
-
+#include <stdlib.h>
+#include <stdio.h>
 Objet generate_weapon(int etage){
 	Objet sword;
 	int atk;
@@ -34,8 +35,6 @@ void print_armor(Objet armor){
 
 Objet generate_objet(int etage, TypeObjet type){
 	Objet obj;
-	int val;
-	int bonus;
 	obj.type = type;
 	obj.specificite.qualite = 1 + rand() % (etage);
 	switch(type) {

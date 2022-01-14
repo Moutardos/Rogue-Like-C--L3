@@ -1,4 +1,5 @@
 #include "attribut.h"
+#include <stdlib.h>
 Attribut init_PJ_attribut(Race race){
 	Attribut stat_PJ;
 	switch(race){
@@ -13,8 +14,6 @@ Attribut init_PJ_attribut(Race race){
 			stat_PJ.Def = 25;
 			break;
 	}
-	stat_PJ.Hp = get_max_hp(stat_PJ, 0); 			 
-	stat_PJ.Mp = get_max_mp(stat_PJ, 0);
 	return stat_PJ;
 }
 

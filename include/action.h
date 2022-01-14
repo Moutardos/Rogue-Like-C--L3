@@ -37,7 +37,7 @@ Position next_position(Floor* etage, Action action);
 void deplacer_joueur(Floor* etage, Action action, Position new_pos);
 
 /* Permet au joueur de naviger dans la selection de loot du tresor */
-int treasure_opening(Personnage* pj, Coffre chest);
+void treasure_opening(Personnage* pj, Coffre chest);
 
 /* Libere les donnes alloue avant de quitter le jeu */ 
 void exit_game(Floor* etage);
@@ -47,4 +47,8 @@ void start_etage(Floor* etage);
 /* Permet au joueur de choisir visuelement quelles stats augmenter */
 void choose_stats_lvlup(Personnage* pj);
 
+/* Utilise l'item dans la position i de l'inventaire du joueur */
+int use_item(Personnage* pj, int i);
+/* Permet au joueur de choisir si il veut continuer ou non la partie */
+int continue_menu(Floor* etage);
 #endif

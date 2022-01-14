@@ -32,12 +32,9 @@ int test_floor(){
 }
 
 int test_affichage(){
-	Action action;
 	Personnage pj = creation_perso(HUMAN);
 	Floor* etage = init_floor(pj);
-	int action_done;
 	start_etage(etage);
-	etage->joueur.xp = 449;
 
 	if (! init_mlv()){
 		fprintf(stderr, "DEBUG : init_mlv couldn't allocate correctly ! exiting..\n");
@@ -45,17 +42,8 @@ int test_affichage(){
 		return 0;
 
 	} 
-	 
-	while ( (action_done = treat_action(etage)) != -1){
-		while (etage->joueur.stat.Hp > 0 ){
-			if (action_done == 0)
-				continue;
-			enemy_turn(etage); /* todo : enemy return la position du fight si besoin puis le fait */
-			hud(etage->joueur);
-		}
-	}
-	exit_game(etage);
 	return 1;
+
 }
 
 int test_objet(){
@@ -72,7 +60,6 @@ int test_objet(){
 
 int test_action(){
 	Personnage pj = creation_perso(HUMAN);
-	Floor* etage = init_floor(pj);
 	init_mlv();
 	while(1){
 		printf("PJ: %d ATK %d INT %d DEF\n", pj.stat.Atk,  pj.stat.Int,  pj.stat.Def);

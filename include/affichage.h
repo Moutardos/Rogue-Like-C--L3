@@ -20,6 +20,9 @@
 int init_mlv();
 void free_graph();
 
+/* Free l'alocution faite pour la vision du joueur */
+void free_vision_joueur(int n);
+
 /* Load l'image qui va etre affiche dans l'ecran a la position indique */
 int load_cell(Floor* etage, Position cellpos, MLV_Image** image);
 
@@ -69,11 +72,21 @@ void display_stat(Personnage pj, int* stat_lvlup, int curseur);
 
 /* Affiche le menu permettant de continuer ou arreter de jouer */
 void display_continue(int index);
+
+/* Affiche en bas a gauche l'objet du slot indique*/
+void display_selected_item(Objet objet,int slot);
+
 /* Affiche le contenu de l'inventaire du joueur aux emplacements adéquats */
 void draw_inventory(Personnage pj);
 
+/* Affiche la barre de vie d'un ennemie a sa position */
+void draw_bar_on_ennemy(Floor* etage, Position pos_monstre, Monstre monstre);
+
 /* Affiche un coffre ouvert et son contenu */
 void draw_chest(Objet content[], int size);
+
+/* Redessine la cellule a la position absolue pos */
+void update_cell(Floor* etage, Position pos);
 
 /* FONCTION DEBUG, affiche le niveau en ascii
 */

@@ -1,7 +1,7 @@
 
 #include "coffre.h"
 #include <stddef.h>
-
+#include <stdlib.h>
 Coffre init_coffre(int etage){
 	Coffre new_coffre;
 	int i = rand() % 3 + 1, j;

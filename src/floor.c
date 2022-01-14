@@ -82,7 +82,7 @@ int generate_floor(Floor* etage){
  	return 0;
 }
 
-Position* generate_elem(Floor* etage){
+void generate_elem(Floor* etage){
 	unsigned int i;
 	int len = 0;
 	int pj_level = etage->joueur.level;
@@ -177,7 +177,6 @@ void spawn_protected_treasure(Floor* etage, int len,Position* pos_libre, int nb_
 void spawn_perso(Floor * etage){
 	Position stair;
 	Position treasure;
-	unsigned i = 0;
 	stair.x = FLOORW/2;
 	stair.y = FLOORH/2;
 

@@ -3,8 +3,8 @@
 #include "affichage.h"
 #include "floor.h"
 #include "action.h"
+#include "time.h"
 int main(int argc, char const *argv[]){
-	Action action;
 	Personnage pj;
 	Floor* etage;
 	int showmap = 0;
