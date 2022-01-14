@@ -45,5 +45,6 @@ void exit_game(Floor* etage);
 /* Genere et affiche un nouveau terrain */
 void start_etage(Floor* etage);
 /* Permet au joueur de choisir visuelement quelles stats augmenter */
-int* choose_stats_lvlup(Personnage* pj, int* stat);
+void choose_stats_lvlup(Personnage* pj);
+
 #endif

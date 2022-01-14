@@ -14,6 +14,7 @@ typedef struct floor{
 	int nb_monstre;
 	Position* monstres_pos;
 	int number;
+	int xp_gain;
 
 }Floor;
 

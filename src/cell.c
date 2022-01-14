@@ -3,9 +3,10 @@
 
 int is_traversable(Celltype type){
 	switch(type){
-		case WALL : return 0;
-		case TREASURE : return 0;
-		case MONSTER : return 0;
+		case WALL :
+		case TREASURE : 
+		case MONSTER :
+		case STAIR_DOWN: return 0;
 		default : return 1;
 	}
 } 

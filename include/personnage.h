@@ -34,6 +34,9 @@ int get_max_mp(Personnage pj);
 /* Nombre d'xp a atteindre avant d'atteindre le level indique */
 int xp_to_levelup(int level);
 
+/* Donne un nombre d'xp au personnage, si il possede plus d'xp que necessaire pour
+   levelup, renvoie 1 et garde le reste */
+int gain_xp(Personnage* pj, int xp);
 
 /* Augmente les 3 stats ([0] = atk, [1] = int, [2] = def) selon ce qu'a choisis le joueur */
 void level_up(Personnage* pj, int* stat_lvlup);
@@ -42,7 +45,7 @@ void level_up(Personnage* pj, int* stat_lvlup);
    -1 -> pas assez de mp pour la wand
    1 -> kill
    0 -> monstre encore vivant */
-int hit_enemy(Personnage pj,Monstre* monstre);
+int hit_enemy(Personnage* pj,Monstre* monstre);
 
 /* Selectione uniquement l'item a la place nb dans l'inventaier*/
 void select_item(Personnage* pj, int nb);
@@ -51,6 +54,9 @@ int is_potion_active(Personnage pj, TypePotion type);
 
 /* Ajoute un nouvel item au joueur dans son inventaire si il a de la place */
 void get_new_item(Personnage* pj, Objet objet);
+
+/* Bois la potion et la rend active */
+void drink_potion(Personnage* pj, Potion potion, int index);
 
 /* Supprime de l'inventaire l'objet a la position index */
 void discard_item(Personnage* pj, int index);

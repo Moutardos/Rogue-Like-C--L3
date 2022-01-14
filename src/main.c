@@ -5,29 +5,45 @@
 #include "action.h"
 int main(int argc, char const *argv[]){
 	Action action;
-	Personnage pj = creation_perso(HUMAN);
+	Personnage pj;
 	Floor* etage;
-
+	int showmap = 0;
+	int i;
 	int action_done;
+	int stop = 0;
+	srand(time(NULL));
+
 	if (!test())
 		return 1;
 
 	if (!init_mlv())
 		return 1;
 	
-	get_new_item(&pj, generate_objet(10, WEAPON));
-		get_new_item(&pj, generate_objet(10, WEAPON));
 
- 	etage = init_floor(pj);
-
-	start_etage(etage);
-	while ( (action_done = treat_action(etage)) != -1){
-		if (action_done == 0)
-			continue;
-		affiche_floor_ascii(etage);
-		enemy_turn(etage); /* todo : enemy return la position du fight si besoin puis le fait */
-		hud(etage->joueur);
+	for(i = 1; i < argc; i++)
+		if (strcmp("-m", argv[i]) == 0)
+			showmap = 1;
+	
+	while(!stop){
+		pj = creation_perso(HUMAN);
+ 		etage = init_floor(pj);
+		start_etage(etage);
+		while ( !stop && etage->joueur.stat.Hp > 0){
+			action_done = treat_action(etage);
+			if (action_done == -1)
+				stop = continue_menu(etage);
+			if (action_done == 0)
+				continue;
+			if(showmap)
+				affiche_floor_ascii(etage);
+			enemy_turn(etage); 
+			potion_effects(&etage->joueur);
+			hud(etage->joueur);
+		}
+		if (etage->joueur.stat.Hp <= 0)
+			stop = continue_menu(etage);
 	}
+	
 	exit_game(etage);
 	return 0;
 }

@@ -16,7 +16,6 @@ Floor* init_floor(Personnage pj){
 	etage->number = 0;
 	etage->nb_monstre = 0;
 	etage->nb_coffre = 0;
-
 	return etage;
 
 }
@@ -34,7 +33,6 @@ int generate_floor(Floor* etage){
 	int  len_voisines;
 	int pos;
 	unsigned int i, j;
-	srand(time(NULL));
 	for (j = 0; j < FLOORH; ++j)
 		for (i = 0; i < FLOORW; ++i){
 			if (i == FLOORW/2 && j == FLOORH/2)
@@ -79,7 +77,6 @@ int generate_floor(Floor* etage){
 	}
 	spawn_perso(etage);
 
-    affiche_floor_ascii(etage);
 		generate_elem(etage);
 
  	return 0;
@@ -88,17 +85,20 @@ int generate_floor(Floor* etage){
 Position* generate_elem(Floor* etage){
 	unsigned int i;
 	int len = 0;
-	Position* empty_tiles = list_of_tiles(etage,&len, 4, ROOM);
-	printf("1len   %d\n", len);
+	int pj_level = etage->joueur.level;
+	Position* empty_tiles = list_of_tiles(etage,&len, 3, ROOM);
 
-	for(i = 0; i < 5; i++)
+	for(i = 0; i < 10; i++)
 		spawn_elem_in_list(etage, MONSTER, &len, empty_tiles);
 
 
 	
-	spawn_protected_treasure(etage, len, empty_tiles, 7);
+	spawn_protected_treasure(etage, len, empty_tiles, 9);
 	empty_tiles = list_of_tiles(etage, &len, 25, ROOM);
 	spawn_elem_in_list(etage, STAIR_DOWN, &len, empty_tiles);
+
+	/* Un monstre donne assez d'xp de sorte a ce que le joueur gagne 2 levels si il tue tout l'etage */
+	etage->xp_gain = (xp_to_levelup(pj_level +1) + xp_to_levelup(pj_level +2)) / (etage->nb_monstre-3);
 	free(empty_tiles);
 
 }
@@ -110,6 +110,7 @@ Position spawn_elem_in_list(Floor* etage, Celltype type, int* len, Position* pos
 	pos = pos_libre[index];
 	spawn_elem(etage, type, pos);
 	remove_pos(pos_libre, index, len);
+
 	return pos;
 }
 
@@ -191,7 +192,6 @@ void spawn_perso(Floor * etage){
 
 	spawn_elem(etage, TREASURE, treasure);
 
-	printf("char spawn = %d %d\n", etage->joueur.pos.x, etage->joueur.pos.y);
 
 }
 

@@ -15,21 +15,31 @@
 #define BORDER_GAME CELLSIZE * RANGE
 
 
-/* Initialise la fenetre
+/* Initialise la fenetre, load les images utilise dans affichage
 */
-
 int init_mlv();
+void free_graph();
 
+/* Load l'image qui va etre affiche dans l'ecran a la position indique */
 int load_cell(Floor* etage, Position cellpos, MLV_Image** image);
 
 
+/* Renvoie l'url du sprite indique */
 const char* image_url(Celltype cell_type, int theme);
 const char* image_url_monstre(TypeMonstre monstre);
 const char* image_url_object(Objet objet);
 
-int init_vision(Floor* etage);
-void free_graph();
 
+/* Load les cellules du jeu qui vont etre affiche a l'ecran */
+int init_vision(Floor* etage);
+
+/* Refresh l'ecran de jeu */
+void refresh_vision(Floor* etage);
+
+
+/* Deplace toute les cellules visibles dans une direction, en gardant le joueur au millieu.
+   Free les images qui ne vont plus etre utilise lors de l'affichage et load les nouvelles images
+*/
 int movement_vision(Floor* etage, Cardinal direction);
 
 /* FONCTION DEBUG, renvoie un char indiquant le type de cell
@@ -54,6 +64,11 @@ void draw_char_bars(Personnage pj, int portrait_size);
 /* Affiche une barre a la position indique, affichant le pourcentage de completion */
 void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag);
 
+/* Affiche les statistique du joueur et, si non null, l'affichage pour les augmenter apres un level up*/
+void display_stat(Personnage pj, int* stat_lvlup, int curseur);
+
+/* Affiche le menu permettant de continuer ou arreter de jouer */
+void display_continue(int index);
 /* Affiche le contenu de l'inventaire du joueur aux emplacements adéquats */
 void draw_inventory(Personnage pj);
 

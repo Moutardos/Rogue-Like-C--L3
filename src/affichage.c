@@ -12,12 +12,11 @@ static MLV_Image*** vision_joueur;
 static MLV_Image* bars;
 static MLV_Image* ennemy_hp;
 static MLV_Image* obj_selected;
-static MLV_Font* font;
-
+static MLV_Image* stat_screen;
 int init_mlv(){
 		unsigned int i = 0;
         
-        MLV_create_window( "ver 0.23 !", "roguelike", WINDOWS_W, WINDOWS_H );
+        MLV_create_window( "Rendu final!", "roguelike", WINDOWS_W, WINDOWS_H );
         image_perso = MLV_load_image("art/sprite/char/mc.png");
         MLV_resize_image(image_perso, CELLSIZE , CELLSIZE );
         
@@ -28,8 +27,7 @@ int init_mlv(){
         
         inventory = MLV_load_image("art/hud/inventory.png");
         MLV_resize_image(inventory, INVENTORY_SLOT , INVENTORY_SLOT );
-        
-        font = MLV_load_font( "art/fonts/arial.ttf" , 20 );
+        MLV_change_default_font("art/fonts/arial.ttf" , 20 );
 
         vision_joueur =  malloc(sizeof(MLV_Image**) * (RANGE *2));
         if( vision_joueur == NULL){
@@ -38,9 +36,10 @@ int init_mlv(){
         }
         	
         /* Permet de free les images facilement pour l'actualisation */ 
-		bars = MLV_create_image(0,0);
-		ennemy_hp = MLV_create_image(0,0);
-		obj_selected= MLV_create_image(0,0);
+		bars = MLV_create_image(0, 0);
+		ennemy_hp = MLV_create_image(0, 0);
+		obj_selected= MLV_create_image(0, 0);
+		stat_screen = MLV_create_image(0, 0);
 
         for(i = 0; i < RANGE*2; i++){
 			vision_joueur[i] = malloc(sizeof(MLV_Image*) * (RANGE * 2));
@@ -100,7 +99,6 @@ int load_cell( Floor* etage, Position cellpos, MLV_Image** image){
         MLV_resize_image(*image , 1,1 );
 
 	}
-	/* else affiche carre noir */
 	return 1;
 }
 
@@ -160,9 +158,9 @@ int init_vision(Floor* etage){
 			load_cell(etage, cellpos, &vision_joueur[j][i]); 
 			MLV_draw_image(vision_joueur[j][i], CELLSIZE * i, CELLSIZE * j);
 
-			if( cellpos.x == pos_joueur.x && cellpos.y == pos_joueur.y){
+			if( cellpos.x == pos_joueur.x && cellpos.y == pos_joueur.y)
 				MLV_draw_image(image_perso, CELLSIZE * i, CELLSIZE * j);
-			} 
+			
 
 
 		}
@@ -170,6 +168,21 @@ int init_vision(Floor* etage){
 	hud(etage->joueur);
 	MLV_actualise_window();
 	return 0; 
+}
+
+void refresh_vision(Floor* etage){
+	unsigned int i,j;
+	for (j = 0; j <RANGE; ++j){ 
+		for (i = 0; i <RANGE; ++i){
+			MLV_draw_image(vision_joueur[j][i], CELLSIZE * i, CELLSIZE * j);
+
+			if( i == RANGE/2 && j == RANGE/2)
+				MLV_draw_image(image_perso, CELLSIZE * i, CELLSIZE * j);
+			
+		}
+	}
+	MLV_actualise_window();
+
 }
 
 int movement_vision(Floor* etage, Cardinal direction){
@@ -209,11 +222,9 @@ int movement_vision(Floor* etage, Cardinal direction){
 									x = 0  y = -1  ->   h = 0  h =  (y - x)/2 * y
 								*/
 	decalage_x = (placement[0] - movement)/2 * placement[0];
-	printf("Decalage y   %d     \n", decalage_y);
 	for(j = start  ; j < RANGE - (1 - decalage_y)*placement[1]   && j >= 0 + decalage_y*placement[1]; j += movement){
 		for(i = start ; i < RANGE - (1 - decalage_x)*placement[0]  && i >= 0 + decalage_x*placement[0]; i += movement){
 			/* Ignore si la prochaine case est vide (en dehors du plateau) */
-				printf("1\n");
 			/* position de la prochaine case dans la vision du joueur*/
 			next_pos.x = i + movement * placement[0];
 			next_pos.y = j + movement * placement[1];
@@ -224,18 +235,14 @@ int movement_vision(Floor* etage, Cardinal direction){
 			
 
 
-							printf("vision_joueur[%d][%d] : etage[%d][%d]off_limit ? %d \n", j, i, cellpos.y, cellpos.x, !is_legal(cellpos.x, cellpos.y));
 
 			if (((i == start && placement[0]) || (j == start && placement[1])) && is_legal(cellpos.x, cellpos.y)){
-				printf("je l'ai free");
 				MLV_free_image(vision_joueur[j][i]);
 			}
 			
-			printf("[%d %d]",j,i);
 
 
 			if (!is_legal(cellpos.x, cellpos.y)){
-				printf("bonjour\n");
 
 				MLV_draw_image(off_limit, CELLSIZE * i, CELLSIZE * j);
 				continue;
@@ -254,11 +261,9 @@ int movement_vision(Floor* etage, Cardinal direction){
 
 
 		}
-		printf("\n" );
 	}
     
     /** LOADING **/
-		printf("LOADING\n");
 	/* La derniere ligne est une ligne pas presente dans l'ancien vision_joueur, on va la load */
 	if(placement[1]){
 		last_line = j;	/* Si le deplacement est vertical */
@@ -272,10 +277,8 @@ int movement_vision(Floor* etage, Cardinal direction){
 
 			}
 			else{
-						printf("vision_joueur[%d][%d] -> etage[%d][%d] -> type =%d\n",last_line,i, cellpos.y,cellpos.x, position_type(etage, cellpos) ); 
 				load_cell(etage, cellpos, &vision_joueur[last_line][i]); 
 			MLV_draw_image(vision_joueur[last_line][i], CELLSIZE * i, CELLSIZE * last_line);
-				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
 
 		}
 		}
@@ -292,11 +295,9 @@ int movement_vision(Floor* etage, Cardinal direction){
 
 			}
 			else{
-						printf("vision_joueur[%d][%d] -> etage[%d][%d] \n",j, last_line, cellpos.y,cellpos.x ); 
 				load_cell(etage, cellpos, &vision_joueur[j][last_line]); 
 				MLV_draw_image(vision_joueur[j][last_line], CELLSIZE * last_line, CELLSIZE * j);
 
-				/*    MLV_wait_keyboard(NULL,NULL,NULL);*/
 			}
 		}
 	}
@@ -343,18 +344,44 @@ void hud(Personnage pj){
 	for(i = 0; i < 3; i++)
 		for(j = 0; j < 3; j++) {
 			MLV_draw_image(inventory, BORDER_GAME + j* INVENTORY_SLOT, INVENTORY_SLOT * (i + 1));
-			MLV_draw_text_with_font(BORDER_GAME + j* INVENTORY_SLOT + 5, INVENTORY_SLOT * (i + 1) + 5, "%d", font, MLV_COLOR_WHITE, i*3 + j + 1);
+			MLV_draw_text(BORDER_GAME + j* INVENTORY_SLOT + 5, INVENTORY_SLOT * (i + 1) + 5, "%d", MLV_COLOR_WHITE, i*3 + j + 1);
 		}
 	MLV_draw_image(inventory, BORDER_GAME, INVENTORY_SLOT * 4);
-	MLV_draw_text_with_font(BORDER_GAME + 5, INVENTORY_SLOT * 4 + 5, "0", font, MLV_COLOR_WHITE);
+	MLV_draw_text(BORDER_GAME + 5, INVENTORY_SLOT * 4 + 5, "0", MLV_COLOR_WHITE);
 	MLV_draw_image(inventory, BORDER_GAME + (WINDOWS_W - BORDER_GAME) / 2.5, INVENTORY_SLOT * 4.2);
 	MLV_draw_image(inventory, BORDER_GAME + 2 * INVENTORY_SLOT, INVENTORY_SLOT * 4.2);
 
 	draw_inventory(pj);
-	
+	display_stat(pj, NULL, 0);
 	MLV_actualise_window();
 }
 
+void display_continue(int index){
+	MLV_draw_text(WINDOWS_W/2 -200, WINDOWS_H/2, "CONTINUE", MLV_COLOR_WHITE);
+	MLV_draw_text(WINDOWS_W/2 -200, WINDOWS_H/2 + 100, "STOP PLAYING", MLV_COLOR_WHITE);
+	MLV_draw_text(WINDOWS_W/2, WINDOWS_H/2 + 100*index, "X", MLV_COLOR_RED);
+	MLV_actualise_window();
+
+}
+void display_stat(Personnage pj, int* stat_lvlup, int curseur){
+	unsigned int i;
+
+	MLV_free_image(stat_screen);
+	stat_screen = MLV_create_image(WINDOWS_W - BORDER_GAME, 80);
+	MLV_draw_text_on_image(0, 0, "LVL: %d", MLV_COLOR_WHITE, stat_screen, pj.level);
+	MLV_draw_text_on_image(0, 20, "ATK: %d", MLV_COLOR_WHITE, stat_screen, pj.stat.Atk + pj.gear[0].bonus.Atk);
+	MLV_draw_text_on_image(0, 40, "INT: %d", MLV_COLOR_WHITE, stat_screen, pj.stat.Int + pj.gear[0].bonus.Int);
+	MLV_draw_text_on_image(0, 60, "DEF: %d", MLV_COLOR_WHITE, stat_screen, pj.stat.Def + pj.gear[1].bonus.Def);
+	if(stat_lvlup != NULL){
+		for (i = 0; i < 3; i++){
+			MLV_draw_text_on_image(150, 20 + i*20, "+ %d", MLV_COLOR_WHITE, stat_screen, stat_lvlup[i]);
+			if(i == curseur)
+				MLV_draw_text_on_image(250, 20 + i*20, "X", MLV_COLOR_RED, stat_screen);
+		}
+	}
+	MLV_draw_image(stat_screen, BORDER_GAME, WINDOWS_H - INVENTORY_SLOT - 80);
+	MLV_actualise_window();
+}
 void draw_char_bars(Personnage pj, int portrait_size){
 	Attribut stat_pj =  pj.stat;
 	float xp_percent = pj.xp / xp_to_levelup(pj.level+1);
@@ -381,7 +408,6 @@ void draw_bar_on_ennemy(Floor* etage, Position pos_monstre, Monstre monstre){
 void draw_bar_on_image(MLV_Image* image, int value, int max_value, int x, int y, int height, int width, MLV_Color color, const char* tag){
 	float percent = value/(max_value * 1.0);
 	char stat_txt[999];
-	printf("%s %f %d/%d\n", tag, percent, value, max_value);
 	MLV_draw_filled_rectangle_on_image(x, y, (int) (percent * (float) width), height, color, image);
 	if (tag != NULL){
 		sprintf(stat_txt, "%s: %d/%d", tag, value, max_value);
@@ -418,13 +444,13 @@ void display_selected_item(Objet objet,int slot){
 		MLV_draw_image_on_image(MLV_load_image(image_url_object(objet)),obj_selected, 0,0);
 		switch(objet.type){
 			case WEAPON:
-				sprintf(description, "ATK : %d", objet.bonus.Atk);
+				sprintf(description, "ATK : %d QUALITE %d", objet.bonus.Atk, objet.specificite.qualite);
 				break;
 			case WAND:
-				sprintf(description, "INT : %d", objet.bonus.Int);
+				sprintf(description, "INT : %d QUALITE %d", objet.bonus.Int, objet.specificite.qualite);
 				break;
 			case ARMOR:
-				sprintf(description, "DEF : %d", objet.bonus.Def);
+				sprintf(description, "DEF : %d QUALITE %d", objet.bonus.Def, objet.specificite.qualite);
 				break;
 			case POTION:
 				sprintf(description, "Potion ??");
@@ -433,10 +459,11 @@ void display_selected_item(Objet objet,int slot){
 				break;
 
 		}
-		MLV_draw_text_with_font_on_image(5, 5, "%d", font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
-		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 20, info1, font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
-		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 20 * 2, info2, font, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
-		MLV_draw_text_with_font_on_image(INVENTORY_SLOT, 0, description, font, MLV_COLOR_WHITE, obj_selected);
+		MLV_draw_text_on_image(5, 5, "%d", MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_on_image(INVENTORY_SLOT, 20, info1, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_on_image(INVENTORY_SLOT, 20 * 2, info2, MLV_COLOR_WHITE, obj_selected, (slot +1) %10);
+		MLV_draw_text_on_image(INVENTORY_SLOT, 0, description, MLV_COLOR_WHITE, obj_selected);
+
 	}
 	MLV_draw_image(obj_selected, BORDER_GAME, BORDER_GAME - INVENTORY_SLOT);
 	MLV_actualise_window();
