@@ -110,7 +110,9 @@ int use_item(Personnage* pj, int i){
 			return 1;
 		case POTION:
 			drink_potion(pj, item->specificite.potion, i);
+			
 			display_selected_item(*item,-1);
+			hud(*pj);
 			return 0;
 
 	}
